@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -15,22 +8,22 @@ datasource db {
 }
 
 model images {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  file_id String
-  url String
-  userId String? @db.ObjectId @unique
+  id        String   @id @default(uuid()) @map("_id") @db.ObjectId
+  file_id   String
+  url       String
+  userId    String?  @unique @db.ObjectId // This is the reference to the users model
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  users users? @relation(fields: [userId], references: [id])
+  users     users?   @relation(fields: [userId], references: [id])
 }
 
 model users {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  email String @unique
-  password String?
-  avatar images?
+  id        String   @id @default(uuid()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  password  String?
+  avatar    images?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  imageId String? @db.ObjectId @unique // This is the reference to the images model
+  imageId   String?  @unique @db.ObjectId // This is the reference to the images model
 }

@@ -1,5 +1,5 @@
 {
-  "name": "source",
+  "name": "@./source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -61,6 +61,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "nodemailer": "^7.0.3",
+    "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
   }
 }
