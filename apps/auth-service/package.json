@@ -28,10 +28,10 @@
             "buildTarget": "auth-service:build:production"
           }
         }
-      }, 
-      "test":{
+      },
+      "test": {
         "options": {
-            "passWithNoTests": true
+          "passWithNoTests": true
         }
       }
     }

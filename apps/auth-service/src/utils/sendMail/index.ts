@@ -22,6 +22,7 @@ const renderTemplatee = (
 ): Promise<string> => {
   const templatePath = path.join(
     process.cwd(),
+    'apps',
     'auth-service',
     'src',
     'utils',

@@ -25,5 +25,5 @@ model users {
   avatar    images?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  imageId   String?  @unique @db.ObjectId // This is the reference to the images model
+  following String[]
 }

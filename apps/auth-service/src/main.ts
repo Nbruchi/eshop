@@ -6,10 +6,11 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { errorMiddleware } from 'packages/error-handler/error-middleware';
+import { errorMiddleware } from '@packages/error-handler/error-middleware';
 import { config } from 'dotenv';
 import router from './routes/auth.routes';
 import swaggerUi from 'swagger-ui-express';
+import path from 'path';
 
 const swaggerDocument = require('./swagger-output.json');
 
@@ -32,8 +33,18 @@ app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to auth-service!' });
 });
 
-app.use('/api', router);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/', router);
+app.use(
+  '/swagger-custom.css',
+  express.static(path.join(__dirname, 'swagger-custom.css'))
+);
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, {
+    customCssUrl: '/swagger-custom.css',
+  })
+);
 app.get('/docs-json', (req, res) => {
   res.json(swaggerDocument);
 });

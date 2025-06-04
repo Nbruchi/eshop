@@ -4,10 +4,13 @@ import {
   sendOTP,
   trackOTPRequests,
   validateRegistrationData,
+  verifyOTP,
 } from '../utils/auth.helper';
-import prisma from 'packages/libs/prisma';
-import { ValidationError } from 'packages/error-handler';
+import prisma from '@packages/libs/prisma';
+import bcrypt from 'bcrypt';
+import { ValidationError } from '@packages/error-handler';
 
+// Register user
 export const userRegistration = async (
   req: Request,
   res: Response,
@@ -15,7 +18,7 @@ export const userRegistration = async (
 ) => {
   try {
     validateRegistrationData(req.body, 'user');
-    const { name, email } = req.body;
+    const { name, email, password } = req.body;
 
     const existing = await prisma.users.findUnique({ where: { email } });
 
@@ -32,6 +35,39 @@ export const userRegistration = async (
     return res.status(200).json({
       message: 'OTP sent successfully. Please check your email.',
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// Verify user
+export const verifyUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name, email, otp, password } = req.body;
+
+    if (!name || !email || !otp || !password) {
+      throw new ValidationError('All fields are required');
+    }
+
+    const existing = await prisma.users.findUnique({ where: { email } });
+
+    if (!existing) {
+      throw new ValidationError(`User with email ${email} already exists`);
+    }
+
+    await verifyOTP(email, otp, next);
+    const hashedPassword = await bcrypt.hash(password, 10);
+     await prisma.users.create({
+      data: { name, email, password: hashedPassword },
+     });
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+    })
   } catch (error) {
     return next(error);
   }
