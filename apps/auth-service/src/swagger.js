@@ -8,6 +8,7 @@ const doc = {
   },
   host: 'localhost:6001',
   schemes: ['http'],
+  basePath: '/api/auth',
 };
 
 const outputFile = './swagger-output.json';
