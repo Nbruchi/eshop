@@ -1,8 +1,3 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -33,7 +28,7 @@ app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to auth-service!' });
 });
 
-app.use('/', router);
+app.use('/api/auth', router);
 app.use(
   '/swagger-custom.css',
   express.static(path.join(__dirname, 'swagger-custom.css'))

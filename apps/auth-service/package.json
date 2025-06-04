@@ -1,5 +1,5 @@
 {
-  "name": "@./auth-service",
+  "name": "@eshop/auth-service",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -33,7 +33,34 @@
         "options": {
           "passWithNoTests": true
         }
+      },
+      "build": {
+        "executor": "@nx/webpack:webpack",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "target": "node",
+          "compiler": "tsc",
+          "outputPath": "dist/apps/auth-service",
+          "main": "apps/auth-service/src/main.ts",
+          "tsConfig": "apps/auth-service/tsconfig.app.json",
+          "isolatedConfig": true,
+          "webpackConfig": "apps/auth-service/webpack.config.js"
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "optimization": true,
+            "extractLicenses": true,
+            "inspect": false
+          }
+        }
       }
     }
+  },
+  "devDependencies": {
+    "@swc/register": "^0.1.10"
   }
 }

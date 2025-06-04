@@ -1,8 +1,9 @@
-import crypto from 'crypto';
-import { NextFunction } from 'express';
 import { ValidationError } from '@packages/error-handler';
+import crypto from 'crypto';
+import { NextFunction, Request, Response } from 'express';
 import { sendEmail } from './sendMail';
 import redis from 'packages/libs/redis';
+import prisma from '@packages/libs/prisma';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -79,14 +80,10 @@ export const trackOTPRequests = async (email: string, next: NextFunction) => {
   await redis.set(otpRequestKey, (otpRequests + 1).toString(), 'EX', 3600); // Reset count after 1 hour
 };
 
-export const verifyOTP = async (
-  email: string,
-  otp: string,
-  next: NextFunction
-) => {
+export const verifyOTP = async (email: string, otp: string) => {
   const storedOTP = await redis.get(`otp:${email}`);
   if (storedOTP !== otp) {
-    return next(new ValidationError('Invalid or expired OTP'));
+    throw new ValidationError('Invalid or expired OTP');
   }
 
   const failedAttemptsKey = `otp_attempts:${email}`;
@@ -96,16 +93,74 @@ export const verifyOTP = async (
     if (failedAttempts >= 2) {
       await redis.set(`opt_lock:${email}`, 'locked', 'EX', 1800); // Lock for 30 minutes
       await redis.del(`otp:${email}`, failedAttemptsKey); // Clear OTP after lock
-      return next(
-        new ValidationError(
-          `Too many failed attempts. Your account is locked for 30 minutes.`
-        )
+      throw new ValidationError(
+        `Too many failed attempts. Your account is locked for 30 minutes.`
       );
     }
     await redis.set(failedAttemptsKey, failedAttempts + 1, 'EX', 300); // Increment failed attempts, expire in 5 minutes
-    return next(
-      new ValidationError(`Incorect OTP. ${2 - failedAttempts} attempts left`)
+    throw new ValidationError(
+      `Incorect OTP. ${2 - failedAttempts} attempts left`
     );
   }
   await redis.del(`otp:${email}`, failedAttemptsKey);
+};
+
+export const handleForgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  userType: 'user' | 'seller' = 'user'
+) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return next(new ValidationError('Email is required'));
+    }
+
+    const user =
+      userType === 'user' &&
+      (await prisma.users.findUnique({ where: { email } }));
+
+    if (!user) {
+      throw new ValidationError(`${userType} not Found`);
+    }
+
+    await checkOTPRestrictions(email, next);
+    await trackOTPRequests(email, next);
+
+    // Generate otp and send email
+    await sendOTP(
+      email,
+      user.name,
+      userType === 'user' && 'forgot-password-email'
+    );
+
+    res.status(200).json({
+      message: `OTP sent to your email. Please verify your account`,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const verifyForgotPasswordOTP = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      throw new ValidationError('Emmail and OTP are required');
+    }
+
+    await verifyOTP(email, otp);
+
+    res.status(200).json({
+      message: 'OTP verified successfully. You can now reset your password.',
+    });
+  } catch (error) {
+    next(error);
+  }
 };
