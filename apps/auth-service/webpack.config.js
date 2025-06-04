@@ -16,4 +16,10 @@ module.exports = {
       generatePackageJson: true,
     }),
   ],
+  resolve: {
+    alias: {
+      '@packages/auth': join(__dirname, '../../packages'),
+    },
+    extensions: ['.ts', '.js'],
+  },
 };
