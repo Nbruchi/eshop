@@ -70,13 +70,13 @@ const LoginPage = () => {
                 {String(errors.email.message)}
               </p>
             )}
-            <label htmlFor="email" className="block text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-gray-700 mb-1">
               Password
             </label>
             <div className="relative">
               <input
                 type={passwordVisible ? 'text' : 'password'}
-                id="email"
+                id="password"
                 placeholder="Enter your password"
                 className="w-full p-2 border border-gray-300 outline-none rounded mb-1"
                 {...register('password', {
