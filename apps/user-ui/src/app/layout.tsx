@@ -1,18 +1,12 @@
 import Header from '../shared/widgets/header/header';
-import './global.css';
-import { Poppins, Roboto } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import Providers from './providers';
+import './global.css';
 
 export const metadata = {
   title: 'Eshop',
   description: 'Eshop',
 };
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['100', '300', '400', '500', '700', '900'],
-  variable: '--font-roboto',
-});
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -27,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${poppins.variable}`}>
+      <body className={`${poppins.variable}`}>
         <Providers>
           <Header />
           {children}

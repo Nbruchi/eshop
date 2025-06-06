@@ -5,9 +5,6 @@ import { errorMiddleware } from '@packages/error-handler/error-middleware';
 import { config } from 'dotenv';
 import router from './routes/auth.routes';
 import swaggerUi from 'swagger-ui-express';
-import prisma from 'packages/libs/prisma';
-import redis from 'packages/libs/redis';
-import { createTransport } from 'nodemailer';
 
 const swaggerDocument = require('./swagger-output.json');
 
@@ -35,68 +32,15 @@ app.get('/docs-json', (req, res) => {
 
 app.use(errorMiddleware);
 
-async function checkMongoDB() {
-  try {
-    await prisma.$connect();
-    console.log('✅ MongoDB (Prisma) connected');
-    return true;
-  } catch (err) {
-    console.error('❌ MongoDB (Prisma) connection failed:', err);
-    return false;
-  }
-}
+const port = process.env.PORT || 6001;
+const server = app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}`);
+  console.log(`Swagger UI is available at http://localhost:${port}/api-docs`);
+});
 
-async function checkRedis() {
-  try {
-    await redis.ping();
-    console.log('✅ Redis connected');
-    return true;
-  } catch (err) {
-    console.error('❌ Redis connection failed:', err);
-    return false;
-  }
-}
-
-async function checkNodemailer() {
-  try {
-    const transporter = createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === 'true',
-      service: process.env.SMTP_SERVICE || 'gmail',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-    await transporter.verify();
-    console.log('✅ Nodemailer (SMTP) ready');
-    return true;
-  } catch (err) {
-    console.error('❌ Nodemailer (SMTP) failed:', err);
-    return false;
-  }
-}
-
-async function startServer() {
-  const [mongoOk, redisOk, mailOk] = await Promise.all([
-    checkMongoDB(),
-    checkRedis(),
-    checkNodemailer(),
-  ]);
-  if (!mongoOk || !redisOk || !mailOk) {
-    console.error('Startup aborted: One or more services failed to connect.');
-    process.exit(1);
-  }
-  const port = process.env.PORT || 6001;
-  const server = app.listen(port, () => {
-    console.log(`Listening at http://localhost:${port}/api`);
-    console.log(`Swagger UI is available at http://localhost:${port}/api-docs`);
-  });
-  server.on('error', (err) => {
-    console.error('Server error:', err);
-  });
-}
+server.on('error', (err) => {
+  console.error('Server error:', err);
+});
 
 // Global error handler for unhandled promise rejections and uncaught exceptions
 process.on('unhandledRejection', (reason, promise) => {
@@ -127,5 +71,3 @@ process.on('uncaughtException', (err) => {
   }
   process.exit(1);
 });
-
-startServer();

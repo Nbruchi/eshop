@@ -1,24 +1,16 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import express from 'express';
 import * as path from 'path';
 import cors from 'cors';
 import proxy from 'express-http-proxy';
 import morgan from 'morgan';
-import axios from 'axios';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
-import swaggerUi from 'swagger-ui-express';
 import { config } from 'dotenv';
 
 config();
 
 const app = express();
 
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -43,8 +35,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use('/', proxy('http://localhost:8001'));
-
+app.use('/', proxy('http://localhost:6001/api'));
 app.get('/gateway-health', (req, res) => {
   res.send({ message: 'Welcome to api-gateway!' });
 });
