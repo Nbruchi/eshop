@@ -1,82 +1,134 @@
-# 
+# E-Shop: Modern E-commerce Platform
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+<div align="center">
+  <h3>A Full-Stack E-commerce Solution with Microservices Architecture</h3>
+</div>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## 🌟 Features
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- **Multi-UI System**
 
-## Finish your CI setup
+  - 🛍️ User Interface (Next.js)
+  - 🏪 Seller Dashboard (Next.js)
+  - Modern, responsive design with Tailwind CSS
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/Ou5fXkFN0s)
+- **Authentication & Authorization**
 
+  - 🔐 Secure user authentication
+  - 🔑 JWT with refresh token mechanism
+  - 📧 Email verification system
+  - 🔄 Password reset functionality
+  - 👥 Role-based access control (Users/Sellers)
 
-## Run tasks
+- **Payment Integration**
+  - 💳 Stripe Connect for seller payments
+  - 🏦 Secure payment processing
+  - 💰 Multi-currency support
 
-To run the dev server for your app, use:
+## 🏗️ Architecture
 
-```sh
-npx nx serve auth-service
+The project follows a microservices architecture using Nx monorepo:
+
+```
+apps/
+├── api-gateway/      # API Gateway service
+├── auth-service/     # Authentication & user management
+├── seller-ui/        # Seller dashboard frontend
+└── user-ui/         # Customer-facing frontend
+
+packages/
+├── error-handler/   # Shared error handling
+└── libs/           # Shared libraries
+    ├── prisma/     # Database access layer
+    └── redis/      # Caching layer
 ```
 
-To create a production bundle:
+## 🚀 Technology Stack
 
-```sh
-npx nx build auth-service
+- **Frontend**
+
+  - Next.js 13+ (App Router)
+  - TypeScript
+  - Tailwind CSS
+  - React Query
+
+- **Backend**
+
+  - Node.js
+  - Express
+  - Prisma (ORM)
+  - Redis (Caching)
+  - PostgreSQL
+
+- **DevOps & Tools**
+  - Nx (Monorepo)
+  - Docker
+  - Jest (Testing)
+
+## 🛠️ Getting Started
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/your-username/eshop.git
+   cd eshop
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+
+   ```bash
+   # Copy example env files
+   cp .env.example .env
+   ```
+
+4. **Start development servers**
+
+   ```bash
+   # Start all services
+   npx nx run-many --target=serve --projects=api-gateway,auth-service,user-ui,seller-ui --parallel=4
+
+   # Or start individual services
+   npx nx serve auth-service
+   npx nx serve user-ui
+   npx nx serve seller-ui
+   ```
+
+## 📚 Documentation
+
+- API Documentation is available at `/api/docs` after starting the services
+- Swagger UI for API testing and documentation
+- Each microservice contains its own README with specific setup instructions
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npx nx run-many --target=test --all
+
+# Test specific project
+npx nx test auth-service
 ```
 
-To see all available targets to run for a project, run:
+## 🤝 Contributing
 
-```sh
-npx nx show project auth-service
-```
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 📝 License
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Add new projects
+## 🙏 Acknowledgments
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/node:app demo
-```
-
-To generate a new library, use:
-
-```sh
-npx nx g @nx/node:lib mylib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Nx](https://nx.dev/) for the excellent monorepo tooling
+- [Next.js](https://nextjs.org/) for the fantastic React framework
+- [Stripe](https://stripe.com/) for payment processing
