@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
@@ -26,9 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get('/docs-json', (req, res) => {
   res.json(swaggerDocument);
-
-  app.use('/api', router);
 });
+
+app.use('/api', router);
 
 app.use(errorMiddleware);
 

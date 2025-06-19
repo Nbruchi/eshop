@@ -99,7 +99,7 @@ export const verifyOTP = async (email: string, otp: string) => {
     }
     await redis.set(failedAttemptsKey, failedAttempts + 1, 'EX', 300); // Increment failed attempts, expire in 5 minutes
     throw new ValidationError(
-      `Incorect OTP. ${2 - failedAttempts} attempts left`
+      `Incorrect OTP. ${2 - failedAttempts} attempts left`
     );
   }
   await redis.del(`otp:${email}`, failedAttemptsKey);
@@ -119,8 +119,9 @@ export const handleForgotPassword = async (
     }
 
     const user =
-      userType === 'user' &&
-      (await prisma.users.findUnique({ where: { email } }));
+      userType === 'user'
+        ? await prisma.users.findUnique({ where: { email } })
+        : await prisma.sellers.findUnique({ where: { email } });
 
     if (!user) {
       throw new ValidationError(`${userType} not Found`);
@@ -131,9 +132,11 @@ export const handleForgotPassword = async (
 
     // Generate otp and send email
     await sendOTP(
-      email,
       user.name,
-      userType === 'user' && 'forgot-password-email'
+      email,
+      userType === 'user'
+        ? 'forgot-password-user-email'
+        : 'forgot-password-seller-email'
     );
 
     res.status(200).json({
@@ -152,7 +155,7 @@ export const verifyForgotPasswordOTP = async (
   try {
     const { email, otp } = req.body;
     if (!email || !otp) {
-      throw new ValidationError('Emmail and OTP are required');
+      throw new ValidationError('Email and OTP are required');
     }
 
     await verifyOTP(email, otp);

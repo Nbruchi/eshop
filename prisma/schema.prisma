@@ -11,10 +11,12 @@ model images {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   file_id   String
   url       String
-  userId    String?  @unique @db.ObjectId // This is the reference to the users model
+  userId    String?  @unique @db.ObjectId 
+  shopId String? @unique @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   users     users?   @relation(fields: [userId], references: [id])
+  shops     shops?   @relation(fields: [shopId], references: [id])
 }
 
 model users {
@@ -23,7 +25,53 @@ model users {
   email     String   @unique
   password  String?
   avatar    images?
+  reviews shopReviews[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   following String[]
+}
+
+model shopReviews{
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    user users @relation(fields: [userId],references: [id])
+    rating Float
+    reviews String?
+    shopId String? @db.ObjectId
+    shops shops? @relation(fields: [shopId],references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model shops{
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    bio String?
+    category String
+    avatar images?
+    coverBanner String?
+    address String
+    opening_hours String?
+    website String?
+    socialLInks Json[]
+    ratings Float @default(0)
+    reviews shopReviews[]
+    sellerId String @unique @db.ObjectId
+    sellers sellers @relation(fields: [sellerId],references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model sellers{
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    email String @unique
+    phone String
+    country String
+    password String
+    stripeId String?
+    shopId String? @db.ObjectId
+    shop shops?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

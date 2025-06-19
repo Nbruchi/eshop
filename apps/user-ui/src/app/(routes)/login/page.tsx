@@ -1,7 +1,9 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
 import GoogleButton from 'apps/user-ui/src/shared/components/google-button';
-import { Eye, EyeOff } from 'lucide-react';
+import axios, { AxiosError } from 'axios';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -24,8 +26,29 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm<FormData>();
 
+  const loginMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/login-user`,
+        data,
+        { withCredentials: true }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      setServerError(null);
+      router.push('/');
+    },
+    onError: (error: AxiosError) => {
+      const errorMessage =
+        (error.response?.data as { message?: string })?.message ||
+        'Invalid credentials';
+      setServerError(errorMessage);
+    },
+  });
+
   const onSubmit = async (data: FormData) => {
-    console.log(data);
+    loginMutation.mutate(data);
   };
 
   return (
@@ -66,7 +89,7 @@ const LoginPage = () => {
               })}
             />
             {errors.email && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-500 text-sm text-center">
                 {String(errors.email.message)}
               </p>
             )}
@@ -96,7 +119,7 @@ const LoginPage = () => {
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-500 text-sm text-center">
                 {String(errors.password.message)}
               </p>
             )}
@@ -119,12 +142,17 @@ const LoginPage = () => {
             </div>
             <button
               type="submit"
-              className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg"
+              disabled={loginMutation.isPending}
+              className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg flex items-center justify-center"
             >
-              Login
+              {loginMutation.isPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                'Login'
+              )}
             </button>
             {serverError && (
-              <p className="text-red-500 text-sm mt-2">{serverError}</p>
+              <p className="text-error">{serverError}</p>
             )}
           </form>
           <p className="text-center text-gray-500 my-4">

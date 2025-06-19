@@ -1,0 +1,9 @@
+{
+  "name": "seller-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/seller-ui",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project seller-ui --web",
+  "targets": {}
+}

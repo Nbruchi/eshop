@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "npx nx run-many --target=serve --all",
     "docs": "node apps/auth-service/src/swagger.js",
-    "ui": "npx nx run-many --target=dev --all --projects=user-ui"
+    "user": "npx nx run-many --target=dev --all --projects=user-ui",
+    "seller": "npx nx run-many --target=dev --all --projects=seller-ui",
+    "kill3000": "for /f \"tokens=5\" %a in ('netstat -aon ^| findstr :3000') do taskkill /F /PID %a"
   },
   "private": true,
   "devDependencies": {
@@ -18,7 +20,7 @@
     "@nx/webpack": "^21.1.2",
     "@nx/workspace": "21.1.2",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
-    "@svgr/webpack": "^8.0.1",
+    "@svgr/webpack": "^8.1.0",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.6.0",
     "@swc/core": "~1.5.7",
@@ -71,6 +73,7 @@
     "express-http-proxy": "^2.1.1",
     "express-rate-limit": "^7.5.0",
     "ioredis": "^5.6.1",
+    "jotai": "^2.12.5",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.513.0",
     "morgan": "^1.10.0",
@@ -79,8 +82,14 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-hook-form": "^7.57.0",
+    "react-hot-toast": "^2.5.2",
+    "react-icons": "^5.5.0",
+    "react-select": "^5.10.1",
+    "stripe": "^18.2.1",
+    "styled-components": "^6.1.19",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1",
-    "zod": "^3.25.51"
+    "zod": "^3.25.51",
+    "zustand": "^5.0.5"
   }
 }

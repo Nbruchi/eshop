@@ -47,7 +47,7 @@ const SignupPage = () => {
   const signupMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/user-registration`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/register-user`,
         data
       );
       return response.data;
@@ -102,7 +102,11 @@ const SignupPage = () => {
     },
   });
 
-  const resendOTP = () => {};
+  const resendOTP = () => {
+    if (userData) {
+      signupMutation.mutate(userData);
+    }
+  };
 
   return (
     <div className="w-full py-10 min-h-[85vh] bg-[#f1f1f1]">
@@ -144,7 +148,7 @@ const SignupPage = () => {
                   })}
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm text-center">
                     {String(errors.name.message)}
                   </p>
                 )}
@@ -165,7 +169,7 @@ const SignupPage = () => {
                   })}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm text-center">
                     {String(errors.email.message)}
                   </p>
                 )}
@@ -195,24 +199,28 @@ const SignupPage = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm text-center">
                     {String(errors.password.message)}
                   </p>
                 )}
                 <button
                   type="submit"
                   disabled={signupMutation.isPending}
-                  className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg mt-4"
+                  className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg mt-4 flex items-center justify-center"
                 >
                   {signupMutation.isPending ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <LoaderCircle className="animate-spin" />
-                      Signing Up...
-                    </div>
+                    <LoaderCircle className="animate-spin" />
                   ) : (
                     'Sign Up'
                   )}
                 </button>
+                {signupMutation.isError &&
+                  signupMutation.error instanceof AxiosError && (
+                    <p className="text-error">
+                      {signupMutation.error.response?.data?.message ||
+                        signupMutation.error.message}
+                    </p>
+                  )}
               </form>
               <p className="text-center text-gray-500 my-4">
                 Already have an account?{' '}
@@ -243,7 +251,7 @@ const SignupPage = () => {
                 ))}
               </div>
               <button
-                className="w-full mt-4 text-lg cursor-pointer bg-blue-500 text-white py-2 rounded-lg"
+                className="w-full mt-4 text-lg cursor-pointer bg-blue-500 text-white py-2 rounded-lg flex items-center justify-center"
                 disabled={verifyOTPMutation.isPending}
                 onClick={() => verifyOTPMutation.mutate()}
               >
@@ -267,7 +275,7 @@ const SignupPage = () => {
               </p>
               {verifyOTPMutation.isError &&
                 verifyOTPMutation.error instanceof AxiosError && (
-                  <p className="text-red-500 text-sm mt-2">
+                  <p className="text-error">
                     {verifyOTPMutation.error.response?.data?.message ||
                       verifyOTPMutation.error.message}
                   </p>
