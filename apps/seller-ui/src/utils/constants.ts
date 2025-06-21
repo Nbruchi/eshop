@@ -1,3 +1,5 @@
+import { atom } from 'jotai';
+
 export const countries = [
   { code: 'AU', name: 'Australia' },
   { code: 'AT', name: 'Austria' },
@@ -115,4 +117,17 @@ export const shopCategories = [
   { value: 'mobility', label: 'Mobility & Daily Living Aids' },
   { value: 'sexual_wellness', label: 'Sexual Wellness' },
   { value: 'erotic', label: 'Erotic Literature & Art' },
+];
+
+export const activeSidebarItem = atom<string>('/dashboard');
+
+export const defaultColors = [
+  '#000000',
+  '#ffffff',
+  '#ff0000',
+  '#00ff00',
+  '#0000ff',
+  '#ffff00',
+  '#ff00ff',
+  '#00ffff',
 ];

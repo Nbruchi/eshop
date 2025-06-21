@@ -102,6 +102,9 @@ export const userLogin = async (
       return next(new AuthError(`Invalid password`));
     }
 
+    res.clearCookie('seller_access_token');
+    res.clearCookie('seller_refresh_token');
+
     const accessToken = jwt.sign(
       { id: user.id, role: 'user' },
       process.env.ACCESS_TOKEN_SECRET as string,
@@ -131,12 +134,15 @@ export const userLogin = async (
 
 // refresh token
 export const handleRefreshToken = async (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const refreshToken = req.cookies.refresh_token;
+    const refreshToken =
+      req.cookies['refresh_token'] ||
+      req.cookies['seller_refresh_token'] ||
+      req.headers.authorization.split(' ')[1];
 
     if (!refreshToken) {
       throw new ValidationError(`Unauthorized, no refresh token!`);
@@ -150,9 +156,17 @@ export const handleRefreshToken = async (
       return new JsonWebTokenError(`Forbidden!Invalid refresh token`);
     }
 
-    const user = await prisma.users.findUnique({ where: { id: decoded.id } });
+    let account;
+    if (decoded.role === 'user') {
+      account = await prisma.users.findUnique({ where: { id: decoded.id } });
+    } else {
+      account = await prisma.sellers.findUnique({
+        where: { id: decoded.id },
+        include: { shop: true },
+      });
+    }
 
-    if (!user) {
+    if (!account) {
       return new AuthError(`Forbidden! User/Seller not found!`);
     }
 
@@ -162,7 +176,13 @@ export const handleRefreshToken = async (
       { expiresIn: '15m' }
     );
 
-    setCookie(res, 'access_token', newAccessToken);
+    if (decoded.role === 'user') {
+      setCookie(res, 'access_token', newAccessToken);
+    } else if (decoded.role === 'seller') {
+      setCookie(res, 'seller_access_token', newAccessToken);
+    }
+
+    req.role = decoded.role;
 
     return res.status(201).json({ success: true });
   } catch (error) {
@@ -415,6 +435,9 @@ export const sellerLogin = async (
     if (!isPasswordValid) {
       return next(new AuthError(`Invalid password`));
     }
+
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
 
     const accessToken = jwt.sign(
       { id: seller.id, role: 'seller' },

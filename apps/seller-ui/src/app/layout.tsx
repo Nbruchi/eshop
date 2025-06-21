@@ -20,7 +20,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${poppins.variable}`} suppressHydrationWarning={true}>
+      <body
+        className={`${poppins.variable} min-h-screen bg-slate-900 font-Poppins antialiased`}
+        suppressHydrationWarning={true}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
