@@ -1,21 +1,40 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import express from 'express';
-import * as path from 'path';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { errorMiddleware } from '@packages/error-handler/error-middleware';
+import { config } from 'dotenv';
+import router from './product.routes';
+import swaggerUi from 'swagger-ui-express';
+
+const swaggerDocument = require('./swagger-output.json');
+
+config();
 
 const app = express();
 
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
-app.get('/api', (req, res) => {
-  res.send({ message: 'Welcome to product-service!' });
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get('/docs-json', (req, res) => {
+  res.json(swaggerDocument);
 });
 
-const port = process.env.PORT || 3333;
-const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
+app.use('/', router);
+
+app.use(errorMiddleware);
+
+const port = process.env.PORT || 6002;
+
+app.listen(port, () => {
+  console.log(`Product Service is running at http://localhost:${port}`);
+  console.log(`Swagger UI is available at http://localhost:${port}/api-docs`);
 });
-server.on('error', console.error);

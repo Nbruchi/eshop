@@ -7,13 +7,13 @@ import {
   validateRegistrationData,
   verifyForgotPasswordOTP,
   verifyOTP,
-} from '../utils/auth.helper';
+} from './utils/auth.helper';
 import prisma from '@packages/libs/prisma';
 import bcrypt from 'bcrypt';
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { AuthError, ValidationError } from '@packages/error-handler';
-import { setCookie } from '../utils/cookies/setCookie';
-import stripe from '../config/stripe';
+import { setCookie } from './utils/cookies/setCookie';
+import stripe from './config/stripe';
 
 // Register user
 export const userRegistration = async (
@@ -474,7 +474,7 @@ export const getSeller = async (
 ) => {
   try {
     const seller = req.seller;
-    res.status(201).json({ success: true, seller });
+    res.status(200).json({ success: true, seller });
   } catch (error) {
     next(error);
   }

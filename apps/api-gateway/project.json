@@ -7,12 +7,12 @@
   "targets": {
     "serve": {
       "continuous": true,
-      "executor": "@nx/js:node",
+      "executor": "@nx/js:node:execute",
       "defaultConfiguration": "development",
-      "dependsOn": ["build"],
       "options": {
         "buildTarget": "api-gateway:build",
-        "runBuildTargetDependencies": false
+        "runBuildTargetDependencies": false,
+        "inspect": false
       },
       "configurations": {
         "development": {

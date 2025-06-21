@@ -14,7 +14,7 @@ import {
   verifySeller,
   verifyUser,
   verifyUserForgotPassword,
-} from '../controller/auth.controller';
+} from './auth.controller';
 import isAuthenticated from '@packages/error-handler/isAuthenticated';
 import { isSeller } from '@packages/error-handler/authorizeRoles';
 

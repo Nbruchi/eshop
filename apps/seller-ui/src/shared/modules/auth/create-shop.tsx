@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { countWords } from 'apps/seller-ui/src/utils';
+import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
 import { shopCategories } from 'apps/seller-ui/src/utils/constants';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,10 +22,7 @@ const CreateShop = ({ sellerId, setActiveStep }: Props) => {
 
   const shopCreationMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/create-shop`,
-        data
-      );
+      const response = await axiosInstance.post('/create-shop', data);
       return response.data;
     },
     onSuccess: () => {
