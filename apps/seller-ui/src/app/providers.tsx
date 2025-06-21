@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Provider as JotaiProvider } from 'jotai';
 
 interface Props {
   children?: ReactNode;
@@ -10,7 +11,9 @@ interface Props {
 const Providers = ({ children }: Props) => {
   const [queryClient] = useState(() => new QueryClient());
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <JotaiProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </JotaiProvider>
   );
 };
 

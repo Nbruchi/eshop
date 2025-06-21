@@ -18,8 +18,8 @@ const SidebarItem = ({ title, icon, href, isActive }: Props) => {
         }`}
       >
         {icon}
+        <h5 className="text-lg font-medium text-slate-200">{title}</h5>
       </div>
-      <h5 className="text-lg font-medium text-slate-200">{title}</h5>
     </Link>
   );
 };

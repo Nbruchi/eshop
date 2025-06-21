@@ -13,7 +13,7 @@ import {
   BellPlus,
   BellRing,
   CalendarPlus,
-  Grid,
+  LayoutDashboard,
   List,
   LogOut,
   Mail,
@@ -39,7 +39,7 @@ const SidebarWrapper = () => {
 
   return (
     <Box
-      css={{
+      $css={{
         height: '100vh',
         zIndex: 202,
         position: 'sticky',
@@ -53,13 +53,13 @@ const SidebarWrapper = () => {
       <Sidebar.Header>
         <Box>
           <Link href="/" className="flex justify-center text-center gap-2">
-            <Image src="/icon.svg" alt="logo" width={100} height={20} />
+            <Image src="/icon.svg" alt="logo" width={200} height={40} />
             <Box>
               <h3 className="text-xl font-medium text-[#ecedee]">
-                {seller.shop?.name}
+                {seller?.shop?.name}
               </h3>
               <h5 className="font-medium text-xs text-[#ecedeecf] whitespace-nowrap overflow-hidden text-ellipsis max-w-[170px] pl-2">
-                {seller.shop?.address}
+                {seller?.shop?.address}
               </h5>
             </Box>
           </Link>
@@ -69,7 +69,9 @@ const SidebarWrapper = () => {
         <Sidebar.Body className="body sidebar">
           <SidebarItem
             title="Dashboard"
-            icon={<Grid fill={getIconColor('/dashboard')} size={22} />}
+            icon={
+              <LayoutDashboard fill={getIconColor('/dashboard')} size={22} />
+            }
             isActive={activeSidebar === 'dashboard'}
             href="/dashboard"
           />

@@ -8,6 +8,6 @@ body {
 
 @layer utilities {
   .text-error {
-    @apply text-red-500 text-sm text-center mt-2;
+    @apply text-red-500 text-sm mt-2;
   }
 }

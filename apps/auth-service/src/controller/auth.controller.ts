@@ -184,7 +184,7 @@ export const handleRefreshToken = async (
 
     req.role = decoded.role;
 
-    return res.status(201).json({ success: true });
+    return res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }

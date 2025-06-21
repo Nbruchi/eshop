@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import { config } from 'dotenv';
+import initializeSiteConfig from './libs/initializeSiteConfig';
 
 config();
 
@@ -43,5 +44,11 @@ app.get('/gateway-health', (req, res) => {
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/api`);
+  try {
+    initializeSiteConfig();
+    console.log('Site config initialized');
+  } catch (error) {
+    console.error('Error initializing site config:', error);
+  }
 });
 server.on('error', console.error);

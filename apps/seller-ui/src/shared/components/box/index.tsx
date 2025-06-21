@@ -4,11 +4,11 @@ import { CSSProperties } from 'react';
 import styled from 'styled-components';
 
 interface Props {
-  css?: CSSProperties;
+  $css?: CSSProperties;
 }
 
 const Box = styled.div.attrs<Props>((props) => ({
-  style: props.css,
+  style: props.$css,
 }))<Props>`
   box-sizing: border-box;
 `;

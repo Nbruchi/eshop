@@ -1,4 +1,8 @@
-import ColorPicker from 'apps/seller-ui/src/shared/components/color-picker';
+'use client';
+
+import ColorPicker from 'apps/seller-ui/src/shared/components/ColorPicker';
+import CustomProperties from 'apps/seller-ui/src/shared/components/CustomProperties';
+import CustomSpecifications from 'apps/seller-ui/src/shared/components/CustomSpecifications';
 import ImagePlaceholder from 'apps/seller-ui/src/shared/components/image-placeholder';
 import Input from 'apps/seller-ui/src/shared/components/input';
 import { ChevronRight } from 'lucide-react';
@@ -70,7 +74,7 @@ const CreateProduct = () => {
       <div className="py-4 w-full flex gap-6">
         {/* Left side - Image upload */}
         <div className="md:w-[35%]">
-          {images.length > 8 && (
+          {images.length < 8 && (
             <ImagePlaceholder
               setOpenImageModal={setOpenImageModal}
               size="765 x 850"
@@ -99,7 +103,8 @@ const CreateProduct = () => {
             {/* Product Title input */}
             <div className="w-2/4">
               <Input
-                title="Product Title *"
+                type="text"
+                label="Product Title *"
                 placeholder="Enter product title"
                 {...register('title', {
                   required: `Title is required`,
@@ -196,8 +201,40 @@ const CreateProduct = () => {
                 )}
               </div>
               <div className="mt-2">
-                <ColorPicker />
+                <ColorPicker control={control} errors={errors} />
               </div>
+              <div className="mt-2">
+                <CustomSpecifications control={control} errors={errors} />
+              </div>
+              <div className="mt-2">
+                <CustomProperties control={control} errors={errors} />
+              </div>
+              <div className="mt-2">
+                <label className="block font-semibold text-gray-300 mb-1">
+                  Cash on Delivery
+                </label>
+                <select
+                  defaultValue="yes"
+                  {...register('cashOnDelivery', {
+                    required: `Cash on Delivery is required`,
+                  })}
+                  className="w-full p-2 rounded-md border border-gray-700 bg-black outline-none"
+                >
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+                {errors.cashOnDelivery && (
+                  <p className="text-error">
+                    {String(errors.cashOnDelivery.message)}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="w-2/4">
+              <label className="block font-semibold text-gray-300 mb-1">
+                Category *
+              </label>
             </div>
           </div>
         </div>
