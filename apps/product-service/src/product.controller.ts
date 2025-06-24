@@ -1,5 +1,10 @@
-import { NotFoundError, ValidationError } from '@packages/error-handler';
+import {
+  AuthError,
+  NotFoundError,
+  ValidationError,
+} from '@packages/error-handler';
 import prisma from '@packages/libs/prisma';
+import imageKit from '@packages/libs/imageKit';
 import { Request, Response, NextFunction } from 'express';
 
 // Get product categories
@@ -119,6 +124,117 @@ export const deleteDiscountCode = async (
     return res
       .status(200)
       .json({ message: 'Discount code deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Upload product image
+export const uploadProductImage = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { fileName } = req.body;
+
+    const response = await imageKit.upload({
+      file: fileName,
+      fileName: `product-${Date.now()}.jpg`,
+      folder: 'products',
+    });
+
+    return res.status(201).json({
+      message: 'Image uploaded successfully',
+      fileUrl: response.url,
+      fileId: response.fileId,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete product image
+export const deleteProductImage = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { fileId } = req.params;
+
+    const response = await imageKit.deleteFile(fileId);
+
+    return res.status(200).json({
+      message: 'Image deleted successfully',
+      response,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Create product
+export const createProduct = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      title,
+      description,
+      detailedDescription,
+      warranty,
+      customSpecifications,
+      customProperties,
+      slug,
+      tags,
+      cashOnDelivery,
+      brand,
+      videoUrl,
+      category,
+      subcategory,
+      regularPrice,
+      salePrice,
+      stock,
+      discountCodes,
+      images,
+      colors,
+      sizes,
+    } = req.body;
+
+    if (
+      !title ||
+      !description ||
+      !slug ||
+      !category ||
+      !subcategory ||
+      !regularPrice ||
+      !salePrice ||
+      !stock ||
+      !images ||
+      !colors ||
+      !sizes ||
+      !images.length ||
+      !colors.length ||
+      !sizes.length ||
+      !detailedDescription
+    ) {
+      return next(new ValidationError('All fields are required'));
+    }
+
+    if (!req.seller.id) {
+      return next(new AuthError('Seller not found'));
+    }
+
+    const slugChecking = await prisma.products.findUnique({ where: { slug } });
+
+    if (slugChecking) {
+      return next(
+        new ValidationError(`Slug already exists! Please use a different slug`)
+      );
+    }
   } catch (error) {
     next(error);
   }

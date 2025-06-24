@@ -41,7 +41,17 @@ const nextConfig = {
 
     return config;
   },
-  nx: {},
+  nx: {
+    svgr: false,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ik.imagekit.io',
+      },
+    ],
+  },
 };
 
 const plugins = [

@@ -132,3 +132,11 @@ export const defaultColors = [
   '#00ffff',
 ];
 
+export const aiEnhancements = [
+  { label: 'Remove Background', effect: 'e-removedotbg' },
+  { label: 'Drop Shadow', effect: 'e-dropshadow' },
+  { label: 'Retouch', effect: 'e-retouch' },
+  { label: 'Upscale', effect: 'e-upscale' },
+  { label: 'Remove Blur', effect: 'e-removeblur' },
+  { label: 'Remove Watermark', effect: 'e-removewatermark' },
+];

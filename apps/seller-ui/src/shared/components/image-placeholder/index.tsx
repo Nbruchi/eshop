@@ -1,27 +1,40 @@
 'use client';
 
-import { Pencil, WandSparkles, X } from 'lucide-react';
+import { LoaderCircle, Pencil, WandSparkles, X } from 'lucide-react';
 import Image from 'next/image';
 import { useState, ChangeEvent } from 'react';
+
+type UploadedImage = {
+  fileUrl: string;
+  fileId: string;
+};
 
 interface Props {
   size: string;
   index: any;
+  images: (UploadedImage | null)[];
   small?: boolean;
+  isUploading?: boolean;
+  isDeleting?: boolean;
   onImageChange: (file: File | null, index: number) => void;
   onRemove: (index: number) => void;
   defaultImage?: string | null;
   setOpenImageModal: (openImageModal: boolean) => void;
+  setSelectedImage: (image: string | null) => void;
 }
 
 const ImagePlaceholder = ({
   size,
   index = null,
+  images,
   small,
+  isUploading,
+  isDeleting,
   onImageChange,
   onRemove,
   defaultImage = null,
   setOpenImageModal,
+  setSelectedImage,
 }: Props) => {
   const [imagePreview, setImagePreview] = useState<string | null>(defaultImage);
 
@@ -51,16 +64,29 @@ const ImagePlaceholder = ({
         <>
           <button
             type="button"
+            disabled={isDeleting}
             onClick={() => onRemove?.(index)}
             className="absolute top-3 right-3 p-2 rounded bg-red-600 shadow-lg"
           >
-            <X size={16} />
+            {isDeleting ? (
+              <LoaderCircle className="animate-spin" size={16} />
+            ) : (
+              <X size={16} />
+            )}
           </button>
           <button
             className="absolute top-3 right-[70px] p-2 rounded bg-blue-500 shadow-lg cursor-pointer"
-            onClick={() => setOpenImageModal(true)}
+            onClick={() => {
+              setOpenImageModal(true);
+              setSelectedImage(images[index]?.fileUrl || null);
+            }}
+            disabled={isUploading}
           >
-            <WandSparkles size={16} />
+            {isUploading ? (
+              <LoaderCircle className="animate-spin" size={16} />
+            ) : (
+              <WandSparkles size={16} />
+            )}
           </button>
         </>
       ) : (

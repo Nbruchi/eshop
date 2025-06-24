@@ -4,8 +4,10 @@ import { Router } from 'express';
 import {
   createDiscountCode,
   deleteDiscountCode,
+  deleteProductImage,
   getCategories,
   getDiscountCodes,
+  uploadProductImage,
 } from './product.controller';
 
 const router = Router();
@@ -23,6 +25,20 @@ router.delete(
   isAuthenticated,
   isSeller,
   deleteDiscountCode
+);
+
+router.post(
+  '/upload-product-image',
+  isAuthenticated,
+  isSeller,
+  uploadProductImage
+);
+
+router.delete(
+  '/delete-product-image/:fileId',
+  isAuthenticated,
+  isSeller,
+  deleteProductImage
 );
 
 export default router;
