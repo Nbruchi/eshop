@@ -12,8 +12,10 @@ import {
   BarChart,
   ChevronRight,
   Eye,
+  Loader2,
   Pencil,
   Plus,
+  Search,
   Star,
   Trash,
 } from 'lucide-react';
@@ -51,8 +53,10 @@ const AllProducts = () => {
         header: 'Image',
         cell: ({ row }: any) => (
           <Image
-            src={row.original.image}
-            alt={row.original.image}
+            src={row.original.images[0]?.fileUrl || ''}
+            alt={row.original.images[0]?.fileUrl || ''}
+            width={100}
+            height={100}
             className="w-12 h-12 rounded-md object-cover"
           />
         ),
@@ -158,15 +162,68 @@ const AllProducts = () => {
         <h2 className="text-2xl text-white font-semibold">All Products</h2>
         <Link
           href="/dashboard/create-product"
-          className="bg-blue-800 hover:bg-blue-700 transition text-white px-4 py-2 rounded-lg"
+          className="bg-blue-800 hover:bg-blue-700 transition text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <Plus size={18} /> Add Product
         </Link>
       </div>
       <div className="flex items-center">
         <span className="text-[#80deea] cursor-pointer">Dashboard</span>
-        <ChevronRight size={20} className="opacity-[0.98]" />
-        <span>All Products</span>
+        <ChevronRight size={20} className="opacity-[0.98] text-white" />
+        <span className="text-white">All Products</span>
+      </div>
+      <div className="mb-4 flex items-center bg-gray-900 p-2 rounded-md flex-1">
+        <Search size={18} className="text-gray-400 mr-2" />
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="w-full bg-transparent text-white outline-none"
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+        />
+      </div>
+      <div className="overflow-x-auto bg-gray-900 rounded-lg p-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center">
+            <Loader2 size={24} className="animate-spin text-white" />
+          </div>
+        ) : (
+          <table className="w-full text-white">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id} className="border-b border-gray-800">
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id} className="text-left p-3">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="border-b border-gray-800 hover:bg-gray-900 transition"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="p-3">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

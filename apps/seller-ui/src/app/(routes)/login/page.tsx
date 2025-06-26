@@ -36,7 +36,7 @@ const LoginPage = () => {
     },
     onSuccess: () => {
       setServerError(null);
-      router.push('/');
+      router.push('/dashboard');
     },
     onError: (error: AxiosError) => {
       const errorMessage =
@@ -118,7 +118,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg flex items-center justify-center"
+              className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg flex items-center justify-center mt-4"
             >
               {loginMutation.isPending ? (
                 <LoaderCircle className="animate-spin" />

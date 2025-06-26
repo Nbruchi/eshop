@@ -9,8 +9,8 @@ datasource db {
 
 model images {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  file_id   String
-  url       String
+  fileId    String
+  fileUrl   String
   userId    String?   @unique @db.ObjectId
   shopId    String?   @unique @db.ObjectId
   productId String?   @unique @db.ObjectId

@@ -218,14 +218,23 @@ const CreateProduct = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      await axiosInstance.post(
-        '/products/create-product',
-        data
-      );
+      const payload = {
+        ...data,
+        cashOnDelivery: data.cashOnDelivery === 'yes',
+        images: (data.images || []).filter(
+          (img) => img && img.fileId && img.fileUrl
+        ),
+      };
+      await axiosInstance.post('/products/create-product', payload);
       router.push('/dashboard/all-products');
       toast.success('Product created successfully');
     } catch (error: any) {
-      toast.error(error.data.message);
+      const message =
+        error?.response?.data?.message ||
+        error?.data?.message ||
+        error?.message ||
+        'Something went wrong';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -363,8 +372,8 @@ const CreateProduct = () => {
                       message: `Slug must be at least 3 characters long`,
                     },
                     maxLength: {
-                      value: 50,
-                      message: `Slug cannot go beyond 50 characters`,
+                      value: 100,
+                      message: `Slug cannot go beyond 100 characters`,
                     },
                   })}
                 />
