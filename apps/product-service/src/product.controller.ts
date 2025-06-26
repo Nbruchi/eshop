@@ -235,6 +235,68 @@ export const createProduct = async (
         new ValidationError(`Slug already exists! Please use a different slug`)
       );
     }
+
+    const newProduct = await prisma.products.create({
+      data: {
+        title,
+        description,
+        detailedDescription,
+        warranty,
+        customSpecifications,
+        customProperties,
+        slug,
+        tags: Array.isArray(tags) ? tags : tags.split(','),
+        cashOnDelivery,
+        brand,
+        videoUrl,
+        category,
+        subcategory,
+        regularPrice: parseFloat(regularPrice),
+        salePrice: parseFloat(salePrice),
+        stock: parseInt(stock),
+        discountCodes: discountCodes.map((code: string) => code),
+        images: {
+          create: images
+            .filter((image: any) => image && image.fileId && image.fileUrl)
+            .map((image: any) => ({
+              fileId: image.fileId,
+              fileUrl: image.fileUrl,
+            })),
+        },
+        colors: colors || [],
+        sizes: sizes || [],
+        sellerId: req.seller.id,
+        shopId: req.seller.shopId,
+      },
+      include: {
+        images: true,
+        seller: true,
+        shop: true,
+      },
+    });
+
+    return res.status(201).json({
+      success: true,
+      product: newProduct,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all products
+export const getShopProducts = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const products = await prisma.products.findMany({
+      where: { shopId: req.seller?.shop?.id },
+      include: { images: true },
+    });
+
+    return res.status(200).json({ success: true, products });
   } catch (error) {
     next(error);
   }

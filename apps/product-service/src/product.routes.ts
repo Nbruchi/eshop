@@ -3,10 +3,12 @@ import isAuthenticated from '@packages/error-handler/isAuthenticated';
 import { Router } from 'express';
 import {
   createDiscountCode,
+  createProduct,
   deleteDiscountCode,
   deleteProductImage,
   getCategories,
   getDiscountCodes,
+  getShopProducts,
   uploadProductImage,
 } from './product.controller';
 
@@ -40,5 +42,9 @@ router.delete(
   isSeller,
   deleteProductImage
 );
+
+router.post('/create-product', isAuthenticated, isSeller, createProduct);
+
+router.get('/get-shop-products', isAuthenticated, getShopProducts);
 
 export default router;

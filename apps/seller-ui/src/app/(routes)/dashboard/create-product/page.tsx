@@ -12,8 +12,10 @@ import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
 import { aiEnhancements } from 'apps/seller-ui/src/utils/constants';
 import { ChevronRight, LoaderCircle, Wand, X } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 type FormData = {
   discountCodes: string[];
@@ -53,6 +55,7 @@ const CreateProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeEffect, setActiveEffect] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
   const defaultValues: FormData = {
     discountCodes: [],
@@ -212,8 +215,20 @@ const CreateProduct = () => {
     }
   };
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
+    try {
+      await axiosInstance.post(
+        '/products/create-product',
+        data
+      );
+      router.push('/dashboard/all-products');
+      toast.success('Product created successfully');
+    } catch (error: any) {
+      toast.error(error.data.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
