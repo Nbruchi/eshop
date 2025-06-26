@@ -5,10 +5,12 @@ import {
   createDiscountCode,
   createProduct,
   deleteDiscountCode,
+  deleteProduct,
   deleteProductImage,
   getCategories,
   getDiscountCodes,
   getShopProducts,
+  restoreProduct,
   uploadProductImage,
 } from './product.controller';
 
@@ -46,5 +48,8 @@ router.delete(
 router.post('/create-product', isAuthenticated, isSeller, createProduct);
 
 router.get('/get-shop-products', isAuthenticated, getShopProducts);
+
+router.delete('/delete-product/:id', isAuthenticated, isSeller, deleteProduct);
+router.put('/restore-product/:id', isAuthenticated, isSeller, restoreProduct);
 
 export default router;

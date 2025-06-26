@@ -5,6 +5,7 @@ import { errorMiddleware } from '@packages/error-handler/error-middleware';
 import { config } from 'dotenv';
 import router from './product.routes';
 import swaggerUi from 'swagger-ui-express';
+import './jobs/product-cron-job';
 
 const swaggerDocument = require('./swagger-output.json');
 

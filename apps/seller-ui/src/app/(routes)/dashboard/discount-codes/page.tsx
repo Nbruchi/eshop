@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import DeleteDiscountCodeModal from 'apps/seller-ui/src/shared/components/DeleteDiscountCodeModal';
-import Input from 'apps/seller-ui/src/shared/components/input';
+import Input from 'apps/seller-ui/src/shared/input';
 import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
 import { AxiosError } from 'axios';
 import { ChevronRight, LoaderCircle, Plus, Trash, X } from 'lucide-react';

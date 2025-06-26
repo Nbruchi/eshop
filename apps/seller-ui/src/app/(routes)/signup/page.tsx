@@ -7,7 +7,7 @@ import { useRef, useState, KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import axios, { AxiosError } from 'axios';
 import { countries } from 'apps/seller-ui/src/utils/constants';
-import CreateShop from 'apps/seller-ui/src/shared/modules/auth/create-shop';
+import CreateShop from 'apps/seller-ui/src/shared/components/CreateShop';
 import Image from 'next/image';
 
 const SignupPage = () => {

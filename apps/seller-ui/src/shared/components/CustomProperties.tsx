@@ -1,5 +1,5 @@
 import { Controller } from 'react-hook-form';
-import Input from './input';
+import Input from '../input';
 import { Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

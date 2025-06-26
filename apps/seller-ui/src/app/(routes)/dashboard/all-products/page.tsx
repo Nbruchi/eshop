@@ -1,13 +1,15 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
   flexRender,
 } from '@tanstack/react-table';
+import DeleteConfirmationModal from 'apps/seller-ui/src/shared/components/DeleteConfirmationModal';
 import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
+import { AxiosError } from 'axios';
 import {
   BarChart,
   ChevronRight,
@@ -22,6 +24,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 const AllProducts = () => {
   const [globalFilter, setGlobalFilter] = useState('');
@@ -42,9 +45,47 @@ const AllProducts = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const openAnalytics = (product: any) => {};
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) =>
+      axiosInstance.delete(`/products/delete-product/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shop-products'] });
+      toast.success('Product deleted successfully');
+      setShowDeleteModal(false);
+    },
+    onError: (error: AxiosError) => {
+      const errorMessage =
+        (error.response?.data as { message?: string })?.message ||
+        'Something went wrong';
+      toast.error(errorMessage);
+    },
+  });
 
-  const openDeleteModal = (product: any) => {};
+  const restoreMutation = useMutation({
+    mutationFn: (id: string) =>
+      axiosInstance.put(`/products/restore-product/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shop-products'] });
+      toast.success('Product restored successfully');
+      setShowDeleteModal(false);
+    },
+    onError: (error: AxiosError) => {
+      const errorMessage =
+        (error.response?.data as { message?: string })?.message ||
+        'Something went wrong';
+      toast.error(errorMessage);
+    },
+  });
+
+  const openAnalytics = (product: any) => {
+    setSelectedProduct(product);
+    setShowAnalytics(true);
+  };
+
+  const openDeleteModal = (product: any) => {
+    setSelectedProduct(product);
+    setShowDeleteModal(true);
+  };
 
   const columns = useMemo(
     () => [
@@ -57,7 +98,7 @@ const AllProducts = () => {
             alt={row.original.images[0]?.fileUrl || ''}
             width={100}
             height={100}
-            className="w-12 h-12 rounded-md object-cover"
+            className="rounded-md object-cover w-12 h-12"
           />
         ),
       },
@@ -225,6 +266,17 @@ const AllProducts = () => {
           </table>
         )}
       </div>
+
+      {showDeleteModal && (
+        <DeleteConfirmationModal
+          product={selectedProduct}
+          onRestore={() => restoreMutation.mutate(selectedProduct?.id)}
+          onConfirm={() => deleteMutation.mutate(selectedProduct?.id)}
+          onClose={() => setShowDeleteModal(false)}
+          isDeleting={deleteMutation.isPending}
+          isRestoring={restoreMutation.isPending}
+        />
+      )}
     </div>
   );
 };

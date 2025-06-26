@@ -1,4 +1,4 @@
-import SidebarWrapper from 'apps/seller-ui/src/shared/components/sidebar/sidebar';
+import SidebarWrapper from 'apps/seller-ui/src/shared/sidebar/sidebar';
 import { ReactNode } from 'react';
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
