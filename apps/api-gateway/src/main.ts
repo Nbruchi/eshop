@@ -1,5 +1,4 @@
 import express from 'express';
-import * as path from 'path';
 import cors from 'cors';
 import proxy from 'express-http-proxy';
 import morgan from 'morgan';
@@ -14,7 +13,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTED_URL || 'http://localhost:3000',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
   })

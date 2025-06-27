@@ -13,7 +13,7 @@ import bcrypt from 'bcrypt';
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { AuthError, ValidationError } from '@packages/error-handler';
 import { setCookie } from './utils/cookies/setCookie';
-import stripe from './config/stripe';
+import stripe from '@packages/libs/stripe';
 
 // Register user
 export const userRegistration = async (
@@ -142,7 +142,7 @@ export const handleRefreshToken = async (
     const refreshToken =
       req.cookies['refresh_token'] ||
       req.cookies['seller_refresh_token'] ||
-      req.headers.authorization.split(' ')[1];
+      (req.headers.authorization && req.headers.authorization.split(' ')[1]);
 
     if (!refreshToken) {
       throw new ValidationError(`Unauthorized, no refresh token!`);

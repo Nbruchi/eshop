@@ -6,6 +6,8 @@ import {
 import prisma from '@packages/libs/prisma';
 import imageKit from '@packages/libs/imageKit';
 import { Request, Response, NextFunction } from 'express';
+import stripe from '@packages/libs/stripe';
+import { Prisma } from '@prisma/client';
 
 // Get product categories
 export const getCategories = async (
@@ -317,9 +319,6 @@ export const deleteProduct = async (
       select: { id: true, shop: true, isDeleted: true },
     });
 
-    console.log(req.seller.shopId);
-    console.log(product.shop.id);
-
     if (!product) {
       return next(new NotFoundError('Product not found'));
     }
@@ -390,6 +389,133 @@ export const restoreProduct = async (
       success: true,
       message: 'Product restored successfully',
       product: restoredProduct,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get seller stripe information
+export const getStripeAccount = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { stripeAccountId } = req.seller;
+
+    if (!stripeAccountId) {
+      return next(
+        new ValidationError('Seller does not have a Stripe account linked.')
+      );
+    }
+
+    // Retrieve the main Stripe account object
+    const stripeAccount = await stripe.accounts.retrieve(stripeAccountId);
+
+    // Retrieve the account's balance
+    const balance = await stripe.balance.retrieve({
+      stripeAccount: stripeAccountId,
+    });
+
+    // Retrieve the account's payouts
+    const payouts = await stripe.payouts.list(
+      { limit: 10 },
+      { stripeAccount: stripeAccountId }
+    );
+
+    // Retrieve the account's external bank accounts
+    const externalAccounts = await stripe.accounts.listExternalAccounts(
+      stripeAccountId,
+      {
+        object: 'bank_account',
+        limit: 5,
+      }
+    );
+
+    // Retrieve the account's charges
+    const charges = await stripe.charges.list(
+      { limit: 10 },
+      { stripeAccount: stripeAccountId }
+    );
+
+    // Retrieve the account's transfers
+    const transfers = await stripe.transfers.list(
+      { limit: 10 },
+      { stripeAccount: stripeAccountId }
+    );
+
+    // You can add more Stripe data here as needed
+
+    return res.status(200).json({
+      success: true,
+      stripeAccount,
+      balance,
+      payouts: payouts.data,
+      externalAccounts: externalAccounts.data,
+      charges: charges.data,
+      transfers: transfers.data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all products
+export const getAllProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+    const type = req.query.type || 'latest';
+
+    const baseFilter = {
+      OR: [{ startingDate: null }, { endingDate: null }],
+    };
+
+    const orderBy: Prisma.productsOrderByWithRelationInput =
+      type === 'latest'
+        ? { createdAt: 'desc' as Prisma.SortOrder }
+        : { createdAt: 'asc' as Prisma.SortOrder };
+
+    const [products, total, top10Products] = await Promise.all([
+      prisma.products.findMany({
+        where: baseFilter,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip,
+        take: limit,
+        include: {
+          images: true,
+          shop: true,
+        },
+      }),
+      prisma.products.count({
+        where: baseFilter,
+      }),
+      prisma.products.findMany({
+        take: 10,
+        where: baseFilter,
+        orderBy,
+        include: {
+          images: true,
+          shop: true,
+        },
+      }),
+    ]);
+
+    return res.status(200).json({
+      products,
+      top10By: type === 'latest' ? 'latest' : 'topSales',
+      top10Products,
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
     next(error);

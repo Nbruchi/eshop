@@ -7,9 +7,11 @@ import {
   deleteDiscountCode,
   deleteProduct,
   deleteProductImage,
+  getAllProducts,
   getCategories,
   getDiscountCodes,
   getShopProducts,
+  getStripeAccount,
   restoreProduct,
   uploadProductImage,
 } from './product.controller';
@@ -23,7 +25,7 @@ router.post(
   isSeller,
   createDiscountCode
 );
-router.get('/get-discount-codes', isAuthenticated, isSeller, getDiscountCodes);
+router.get('/get-discount-codes', isAuthenticated, getDiscountCodes);
 router.delete(
   '/delete-discount-code/:id',
   isAuthenticated,
@@ -51,5 +53,7 @@ router.get('/get-shop-products', isAuthenticated, getShopProducts);
 
 router.delete('/delete-product/:id', isAuthenticated, isSeller, deleteProduct);
 router.put('/restore-product/:id', isAuthenticated, isSeller, restoreProduct);
+router.get('/get-stripe-account', isAuthenticated, isSeller, getStripeAccount);
+router.get('/get-all-products', getAllProducts);
 
 export default router;

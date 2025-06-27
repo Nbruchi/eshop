@@ -27,14 +27,13 @@ router.post('/refresh-token', handleRefreshToken);
 router.post('/forgot-password-user', userForgotPassword);
 router.post('/reset-password-user', userResetPassword);
 router.post('/verify-forgot-password-user', verifyUserForgotPassword);
+router.get('/logged-in-user', isAuthenticated, getUser);
 
 router.post('/register-seller', registerSeller);
 router.post('/verify-seller', verifySeller);
 router.post('/create-shop', createShop);
+router.get('/logged-in-seller', isAuthenticated, isSeller, getSeller);
 router.post('/create-stripe-link', createStripeLink);
 router.post('/login-seller', sellerLogin);
-router.get('/logged-in-seller', isAuthenticated, getSeller);
-
-router.get('/logged-in-user', isAuthenticated, isSeller, getUser);
 
 export default router;
