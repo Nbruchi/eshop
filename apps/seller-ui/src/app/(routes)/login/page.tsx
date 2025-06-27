@@ -1,7 +1,8 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
+import { AxiosError } from 'axios';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -27,11 +28,9 @@ const LoginPage = () => {
 
   const loginMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/login-seller`,
-        data,
-        { withCredentials: true }
-      );
+      const response = await axiosInstance.post('/login-seller', data, {
+        withCredentials: true,
+      });
       return response.data;
     },
     onSuccess: () => {

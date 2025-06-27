@@ -1,7 +1,8 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
+import { AxiosError } from 'axios';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -59,10 +60,9 @@ const ForgotPasswordPage = () => {
 
   const requestOTPMutation = useMutation({
     mutationFn: async ({ email }: { email: string }) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/forgot-password-user`,
-        { email }
-      );
+      const response = await axiosInstance.post('/forgot-password-user', {
+        email,
+      });
       return response.data;
     },
     onSuccess: (_, { email }) => {
@@ -83,8 +83,8 @@ const ForgotPasswordPage = () => {
   const verifyOTPMutation = useMutation({
     mutationFn: async () => {
       if (!userEmail) return;
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/verify-forgot-password-user`,
+      const response = await axiosInstance.post(
+        '/verify-forgot-password-user',
         { email: userEmail, otp: otp.join('') }
       );
       return response.data;
@@ -104,10 +104,10 @@ const ForgotPasswordPage = () => {
   const resetPasswordMutation = useMutation({
     mutationFn: async ({ password }: { password: string }) => {
       if (!password) return;
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/reset-password-user`,
-        { email: userEmail, password }
-      );
+      const response = await axiosInstance.post('/reset-password-user', {
+        email: userEmail,
+        password,
+      });
       return response.data;
     },
     onSuccess: () => {

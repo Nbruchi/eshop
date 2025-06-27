@@ -2,7 +2,8 @@
 
 import { useMutation } from '@tanstack/react-query';
 import GoogleButton from 'apps/user-ui/src/shared/components/google-button';
-import axios, { AxiosError } from 'axios';
+import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
+import { AxiosError } from 'axios';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,11 +29,9 @@ const LoginPage = () => {
 
   const loginMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/login-user`,
-        data,
-        { withCredentials: true }
-      );
+      const response = await axiosInstance.post('/login-user', data, {
+        withCredentials: true,
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -151,9 +150,7 @@ const LoginPage = () => {
                 'Login'
               )}
             </button>
-            {serverError && (
-              <p className="text-error">{serverError}</p>
-            )}
+            {serverError && <p className="text-error">{serverError}</p>}
           </form>
           <p className="text-center text-gray-500 my-4">
             Don&apos;t have an account?{' '}

@@ -7,7 +7,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState, KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
+import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
 
 type FormData = {
   name: string;
@@ -46,10 +47,7 @@ const SignupPage = () => {
 
   const signupMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/register-user`,
-        data
-      );
+      const response = await axiosInstance.post('/register-user', data);
       return response.data;
     },
     onSuccess: (_, formData) => {
@@ -88,13 +86,10 @@ const SignupPage = () => {
   const verifyOTPMutation = useMutation({
     mutationFn: async () => {
       if (!userData) return;
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/verify-user`,
-        {
-          ...userData,
-          otp: otp.join(''),
-        }
-      );
+      const response = await axiosInstance.post('/verify-user', {
+        ...userData,
+        otp: otp.join(''),
+      });
       return response.data;
     },
     onSuccess: () => {

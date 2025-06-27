@@ -5,10 +5,11 @@ import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState, KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { countries } from 'apps/seller-ui/src/utils/constants';
 import CreateShop from 'apps/seller-ui/src/shared/components/CreateShop';
 import Image from 'next/image';
+import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
 
 const SignupPage = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -42,10 +43,7 @@ const SignupPage = () => {
 
   const signupMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/register-seller`,
-        data
-      );
+      const response = await axiosInstance.post('/register-seller', data);
       return response.data;
     },
     onSuccess: (_, formData) => {
@@ -84,13 +82,10 @@ const SignupPage = () => {
   const verifyOTPMutation = useMutation({
     mutationFn: async () => {
       if (!sellerData) return;
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/verify-seller`,
-        {
-          ...sellerData,
-          otp: otp.join(''),
-        }
-      );
+      const response = await axiosInstance.post('/verify-seller', {
+        ...sellerData,
+        otp: otp.join(''),
+      });
       return response.data;
     },
     onSuccess: (data) => {
@@ -107,10 +102,9 @@ const SignupPage = () => {
 
   const connectStripe = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/create-stripe-link`,
-        { sellerId }
-      );
+      const response = await axiosInstance.post('/create-stripe-link', {
+        sellerId,
+      });
       if (response.data.url) {
         window.location.href = response.data.url;
       }
