@@ -6,6 +6,10 @@ import Ratings from '../Ratings';
 import { useEffect, useState } from 'react';
 import { Eye, Heart, ShoppingBag } from 'lucide-react';
 import ProductDetailsCard from './ProductDetailsCard';
+import { useStore } from 'apps/user-ui/src/store';
+import useUser from 'apps/user-ui/src/hooks/useUser';
+import useLocationTracking from 'apps/user-ui/src/hooks/useLocationTracking';
+import useDeviceTracking from 'apps/user-ui/src/hooks/useDeviceTracking';
 
 interface Props {
   product: any;
@@ -15,6 +19,9 @@ interface Props {
 const ProductCard = ({ product, isEvent = false }: Props) => {
   const [timeLeft, setTimeLeft] = useState('');
   const [open, setOpen] = useState(false);
+  const { user } = useUser();
+  const { location } = useLocationTracking();
+  const { deviceInfo } = useDeviceTracking();
 
   useEffect(() => {
     if (isEvent && product?.endingDate) {
@@ -43,6 +50,14 @@ const ProductCard = ({ product, isEvent = false }: Props) => {
     }
     return;
   }, [isEvent, product?.endingDate]);
+
+  const addToCart = useStore((state) => state.addToCart);
+  const addToWishlist = useStore((state) => state.addToWishlist);
+  const removeFromWishlist = useStore((state) => state.removeFromWishlist);
+  const wishlist = useStore((state) => state.wishlist);
+  const cart = useStore((state) => state.cart);
+  const isWishlisted = wishlist.some((item) => item.id === product.id);
+  const isInCart = cart.some((item) => item.id === product.id);
 
   return (
     <div className="w-full min-h-[350px] h-max bg-white rounded-lg relative">
@@ -105,8 +120,20 @@ const ProductCard = ({ product, isEvent = false }: Props) => {
           <Heart
             className="cursor-pointer hover:scale-110 transition"
             size={22}
-            fill="red"
-            stroke="red"
+            fill={isWishlisted ? 'red' : 'transparent'}
+            stroke={isWishlisted ? 'red' : '#4b5563'}
+            onClick={() => {
+              if (isWishlisted) {
+                removeFromWishlist(product.id, user, location, deviceInfo);
+              } else {
+                addToWishlist(
+                  { ...product, quantity: 1 },
+                  user,
+                  location,
+                  deviceInfo
+                );
+              }
+            }}
           />
         </div>
         <div className="bg-white rounded-full p-[6px] shadow-md">
@@ -120,6 +147,15 @@ const ProductCard = ({ product, isEvent = false }: Props) => {
           <ShoppingBag
             className="cursor-pointer hover:scale-110 transition text-[#4b5563]"
             size={22}
+            onClick={() => {
+              !isInCart &&
+                addToCart(
+                  { ...product, quantity: 1 },
+                  user,
+                  location,
+                  deviceInfo
+                );
+            }}
           />
         </div>
       </div>

@@ -16,25 +16,25 @@ type Store = {
   addToCart: (
     product: Product,
     user: any,
-    location: string,
+    location: { country: string; city: string } | null,
     deviceInfo: string
   ) => void;
   removeFromCart: (
     id: string,
     user: any,
-    location: string,
+    location: { country: string; city: string } | null,
     deviceInfo: string
   ) => void;
   addToWishlist: (
     product: Product,
     user: any,
-    location: string,
+    location: { country: string; city: string } | null,
     deviceInfo: string
   ) => void;
   removeFromWishlist: (
     id: string,
     user: any,
-    location: string,
+    location: { country: string; city: string } | null,
     deviceInfo: string
   ) => void;
 };

@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 type FormData = {
   discountCodes: string[];
@@ -250,7 +251,9 @@ const CreateProduct = () => {
       </h2>
       {/* Breadcrumb */}
       <div className="flex items-center">
-        <span className="text-[#80deea] cursor-pointer">Dashboard</span>
+        <Link href="/dashboard" className="text-[#80deea] cursor-pointer">
+          Dashboard
+        </Link>
         <ChevronRight size={20} className="opacity-[0.98]" />
         <span>Create Product</span>
       </div>

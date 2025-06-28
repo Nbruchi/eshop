@@ -6,6 +6,7 @@ import Input from 'apps/seller-ui/src/shared/input';
 import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
 import { AxiosError } from 'axios';
 import { ChevronRight, LoaderCircle, Plus, Trash, X } from 'lucide-react';
+import Link from 'next/link';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
@@ -101,7 +102,9 @@ const DiscountCodes = () => {
       </div>
       {/* Breadcrumb */}
       <div className="flex items-center">
-        <span className="text-[#80deea] cursor-pointer">Dashboard</span>
+        <Link href="/dashboard" className="text-[#80deea] cursor-pointer">
+          Dashboard
+        </Link>
         <ChevronRight size={20} className="opacity-[0.98] text-white" />
         <span className="text-white">Discount Code</span>
       </div>

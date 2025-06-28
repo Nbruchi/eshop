@@ -2,6 +2,7 @@
 
 import { navItems } from 'apps/user-ui/src/configs/constants';
 import useUser from 'apps/user-ui/src/hooks/useUser';
+import { useStore } from 'apps/user-ui/src/store';
 import {
   AlignLeft,
   ChevronDown,
@@ -16,6 +17,8 @@ const HeaderBottom = () => {
   const [show, setShow] = useState<boolean>(false);
   const [isSticky, setIsSticky] = useState(false);
   const { user, isLoading } = useUser();
+  const cart = useStore((state) => state.cart);
+  const wishlist = useStore((state) => state.wishlist);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -107,7 +110,9 @@ const HeaderBottom = () => {
                 <Link href="/wishlist" className="relative">
                   <Heart />
                   <div className="h-6 w-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute top-[-10px] right-[-10px]">
-                    <span className="text-white font-medium text-sm">0</span>
+                    <span className="text-white font-medium text-sm">
+                      {wishlist.length}
+                    </span>
                   </div>
                 </Link>
               </div>
@@ -115,7 +120,9 @@ const HeaderBottom = () => {
                 <Link href="/cart" className="relative">
                   <ShoppingCart />
                   <div className="h-6 w-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute top-[-10px] right-[-10px]">
-                    <span className="text-white font-medium text-sm">0</span>
+                    <span className="text-white font-medium text-sm">
+                      {cart.length}
+                    </span>
                   </div>
                 </Link>
               </div>
