@@ -25,7 +25,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Product } from 'apps/user-ui/src/store';
+import { Product } from 'apps/user-ui/src/utils/types';
 
 const AllProducts = () => {
   const [globalFilter, setGlobalFilter] = useState('');
