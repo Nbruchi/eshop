@@ -25,13 +25,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { Product } from 'apps/user-ui/src/store';
 
 const AllProducts = () => {
   const [globalFilter, setGlobalFilter] = useState('');
   const [analyticsData, setAnalyticsData] = useState(null);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const queryClient = useQueryClient();
 
   const fetchProducts = async () => {
@@ -270,8 +271,8 @@ const AllProducts = () => {
       {showDeleteModal && (
         <DeleteConfirmationModal
           product={selectedProduct}
-          onRestore={() => restoreMutation.mutate(selectedProduct?.id)}
-          onConfirm={() => deleteMutation.mutate(selectedProduct?.id)}
+          onRestore={() => restoreMutation.mutate(selectedProduct?.id || '')}
+          onConfirm={() => deleteMutation.mutate(selectedProduct?.id || '')}
           onClose={() => setShowDeleteModal(false)}
           isDeleting={deleteMutation.isPending}
           isRestoring={restoreMutation.isPending}

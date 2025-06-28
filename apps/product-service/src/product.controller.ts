@@ -474,7 +474,7 @@ export const getAllProducts = async (
     const type = req.query.type || 'latest';
 
     const baseFilter = {
-      OR: [{ startingDate: null }, { endingDate: null }],
+      OR: [{ isDeleted: false }, { isDeleted: null }],
     };
 
     const orderBy: Prisma.productsOrderByWithRelationInput =
@@ -482,12 +482,10 @@ export const getAllProducts = async (
         ? { createdAt: 'desc' as Prisma.SortOrder }
         : { createdAt: 'asc' as Prisma.SortOrder };
 
-    const [products, total, top10Products] = await Promise.all([
+    const [products, total] = await Promise.all([
       prisma.products.findMany({
         where: baseFilter,
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy,
         skip,
         take: limit,
         include: {
@@ -498,22 +496,12 @@ export const getAllProducts = async (
       prisma.products.count({
         where: baseFilter,
       }),
-      prisma.products.findMany({
-        take: 10,
-        where: baseFilter,
-        orderBy,
-        include: {
-          images: true,
-          shop: true,
-        },
-      }),
     ]);
 
     return res.status(200).json({
       products,
-      top10By: type === 'latest' ? 'latest' : 'topSales',
-      top10Products,
       total,
+      type,
       currentPage: page,
       totalPages: Math.ceil(total / limit),
     });

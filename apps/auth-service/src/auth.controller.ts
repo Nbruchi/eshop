@@ -257,7 +257,7 @@ export const userResetPassword = async (
 export const getUser = async (req: any, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
-    res.status(201).json({ success: true, user });
+    res.status(200).json({ success: true, user });
   } catch (error) {
     next(error);
   }

@@ -121,6 +121,7 @@ model products {
   regularPrice         Float
   salePrice            Float
   stock                Int
+  totalSales           Int           @default(0)
   sellerId             String        @db.ObjectId
   seller               sellers       @relation(fields: [sellerId], references: [id])
   discountCodes        String[]      @db.ObjectId
