@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Confirmation - Eshop</title>
+    <style type="text/css">
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9fafb;
+        color: #111827;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.04);
+      }
+
+      .header {
+        background-color: #2563eb;
+        padding: 20px;
+        text-align: center;
+        color: #ffffff;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .body {
+        padding: 30px;
+      }
+
+      .body h2 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #111827;
+      }
+
+      .order-summary {
+        background-color: #f3f4f6;
+        padding: 15px;
+        margin-top: 20px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .order-summary p {
+        margin: 6px 0;
+        line-height: 1.4;
+      }
+
+      .total {
+        font-weight: bold;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #2563eb;
+        color: #ffffff;
+        padding: 12px 20px;
+        margin-top: 30px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+
+      .footer {
+        padding: 20px;
+        font-size: 12px;
+        text-align: center;
+        color: #6b7280;
+        background-color: #f9fafb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contaner">
+      <div class="header">
+        <h1>🎊 Order Confirmed!</h1>
+      </div>
+      <div class="body">
+        <h2>Hi <%= name %>,</h2>
+        <p>
+          Thank you for your purchase! We&apos;ve received your order and
+          we&apos;ll start processing it shortly!
+        </p>
+        <div class="order-summary">
+          <%= cart.forEach(item =>{
+          <p>
+            🛒 <strong><%= item.title %></strong> - <%= item.quantity %> x <%=
+            item.salePrice.toFixed(2) %>
+          </p>
+          })%>
+          <p class="total"><%= totalAmount.toFixed(2) %></p>
+        </div>
+        <a href="<%= trackingUrl %>" class="button">📦 Track your Order</a>
+        <p style="margin-top: 20px">
+          If you have any questions, just reply to this email or contact us at
+          <a href="mailto:brucenkundabagenzi@gmail.com">support@eshop.com</a>
+        </p>
+      </div>
+      <div class="footer">
+        &copy; <%= new Date().getFullYear() %> Eshop. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>

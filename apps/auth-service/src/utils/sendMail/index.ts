@@ -29,7 +29,7 @@ const renderTemplatee = (
     'auth-service',
     'src',
     'utils',
-    'email-templates',
+    'emails',
     `${templateName}.ejs`
   );
 

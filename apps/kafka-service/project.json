@@ -1,0 +1,27 @@
+{
+  "name": "kafka-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/kafka-service/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "kafka-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "kafka-service:build:development"
+        },
+        "production": {
+          "buildTarget": "kafka-service:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}

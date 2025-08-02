@@ -57,6 +57,7 @@ const ProductDetailsCard = ({ open, setOpen, data }: Props) => {
               className="w-full rounded-lg object-contain max-h-[500px]"
             />
             <div className="flex gap-2 mt-4">
+              {/* Thumbnails */}
               {data?.images.map((image: ProductImage, index: number) => (
                 <div
                   key={index}

@@ -19,4 +19,8 @@ body {
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
   }
+
+  .page-title {
+    @apply md:pt-[50px] font-medium text-[44px] leading-[1] mb-[16px];
+  }
 }

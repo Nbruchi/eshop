@@ -11,7 +11,11 @@ import {
 import prisma from '@packages/libs/prisma';
 import bcrypt from 'bcrypt';
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
-import { AuthError, ValidationError } from '@packages/error-handler';
+import {
+  AuthError,
+  NotFoundError,
+  ValidationError,
+} from '@packages/error-handler';
 import { setCookie } from './utils/cookies/setCookie';
 import stripe from '@packages/libs/stripe';
 
@@ -69,7 +73,7 @@ export const verifyUser = async (
     await prisma.users.create({
       data: { name, email, password: hashedPassword },
     });
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'User registered successfully',
     });
@@ -123,7 +127,7 @@ export const userLogin = async (
     setCookie(res, 'access_token', accessToken);
     setCookie(res, 'refresh_token', refreshToken);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Logged in successfully!`,
       user: { id: user.id, email: user.email, name: user.name },
     });
@@ -186,7 +190,7 @@ export const handleRefreshToken = async (
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -245,7 +249,7 @@ export const userResetPassword = async (
       data: { password: hashedPassword },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Password reset successfully',
     });
   } catch (error) {
@@ -257,9 +261,9 @@ export const userResetPassword = async (
 export const getUser = async (req: any, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
-    res.status(200).json({ success: true, user });
+    return res.status(200).json({ success: true, user });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -283,7 +287,7 @@ export const registerSeller = async (
       .status(200)
       .json({ message: `OTP sent to email.Please verify your account` });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -318,7 +322,7 @@ export const verifySeller = async (
       .status(201)
       .json({ message: `Seller registered successfully!`, seller });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -362,7 +366,7 @@ export const createShop = async (
 
     return res.status(201).json({ success: true, shop });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -408,7 +412,7 @@ export const createStripeLink = async (
 
     return res.status(200).json({ url: accountLink.url });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -457,7 +461,7 @@ export const sellerLogin = async (
     setCookie(res, 'seller_access_token', accessToken);
     setCookie(res, 'seller_refresh_token', refreshToken);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Logged in successfully!`,
       user: { id: seller.id, email: seller.email, name: seller.name },
     });
@@ -474,8 +478,132 @@ export const getSeller = async (
 ) => {
   try {
     const seller = req.seller;
-    res.status(200).json({ success: true, seller });
+    return res.status(200).json({ success: true, seller });
   } catch (error) {
-    next(error);
+    return next(error);
+  }
+};
+
+// Logout user
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// Logout seller
+export const logoutSeller = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.clearCookie('seller_access_token');
+    res.clearCookie('seller_refresh_token');
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// Create address
+export const addUserAddress = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.id;
+    const { label, name, street, city, country, zip, isDefault } = req.body;
+
+    if (!label || !name || !street || !city || !country || !zip) {
+      return next(new ValidationError(`All fields are required`));
+    }
+
+    if (isDefault) {
+      await prisma.addresses.updateMany({
+        where: {
+          userId,
+          isDefault: true,
+        },
+        data: { isDefault: false },
+      });
+    }
+
+    const address = await prisma.addresses.create({
+      data: { userId, label, name, street, city, zip, country, isDefault },
+    });
+
+    return res.status(201).json({ success: true, address });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const deleteUserAddress = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params;
+
+    if (!id) {
+      return next(new ValidationError('Address ID is required'));
+    }
+
+    const existingAddress = await prisma.addresses.findFirst({
+      where: { id, userId },
+    });
+
+    if (!existingAddress) {
+      return next(new NotFoundError('Address not found'));
+    }
+
+    await prisma.addresses.delete({ where: { id } });
+
+    return res
+      .status(200)
+      .json({ success: true, message: 'Address deleted successfully!' });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getUserAddresses = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.id;
+
+    const addresses = await prisma.addresses.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!addresses) {
+      return next(new NotFoundError('No addresses found'));
+    }
+
+    return res.status(200).json({ success: true, addresses });
+  } catch (error) {
+    return next(error);
   }
 };

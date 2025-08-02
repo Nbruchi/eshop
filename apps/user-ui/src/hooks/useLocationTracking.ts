@@ -25,7 +25,7 @@ const useLocationTracking = () => {
   useEffect(() => {
     if (location) return;
 
-    fetch('https://ip-api.co/json/')
+    fetch('https://ip-api.com/json/')
       .then((res) => res.json())
       .then((data) => {
         const newLocation = {

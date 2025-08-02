@@ -35,9 +35,9 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use('/api/products', proxy('http://localhost:6002'));
 app.use('/products', proxy('http://localhost:6002'));
-app.use('/', proxy('http://localhost:6001/api'));
+app.use('/orders', proxy('http://localhost:6003'));
+app.use('/api', proxy('http://localhost:6001'));
 
 app.get('/gateway-health', (req, res) => {
   res.send({ message: 'Welcome to api-gateway!' });

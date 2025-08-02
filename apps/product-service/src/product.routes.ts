@@ -7,12 +7,18 @@ import {
   deleteDiscountCode,
   deleteProduct,
   deleteProductImage,
+  getAllEvents,
   getAllProducts,
   getCategories,
   getDiscountCodes,
+  getFilteredEvents,
+  getFilteredProducts,
+  getFilteredShops,
+  getProductDetails,
   getShopProducts,
-  getStripeAccount,
   restoreProduct,
+  searchProducts,
+  topShops,
   uploadProductImage,
 } from './product.controller';
 
@@ -53,7 +59,13 @@ router.get('/get-shop-products', isAuthenticated, getShopProducts);
 
 router.delete('/delete-product/:id', isAuthenticated, isSeller, deleteProduct);
 router.put('/restore-product/:id', isAuthenticated, isSeller, restoreProduct);
-router.get('/get-stripe-account', isAuthenticated, isSeller, getStripeAccount);
 router.get('/get-all-products', getAllProducts);
+router.get('/get-product/:slug', getProductDetails);
+router.get('/get-filtered-products', getFilteredProducts);
+router.get('/get-filtered-events', getFilteredEvents);
+router.get('/get-filtered-shops', getFilteredShops);
+router.get('/search-products', searchProducts);
+router.get('/top-shops', topShops);
+router.get('/get-all-events', getAllEvents);
 
 export default router;

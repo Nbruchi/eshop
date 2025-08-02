@@ -1,7 +1,7 @@
 import { ValidationError } from '@packages/error-handler';
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
-import { sendEmail } from './sendMail';
+import { sendEmail } from 'apps/auth-service/src/utils/sendMail';
 import redis from 'packages/libs/redis';
 import prisma from '@packages/libs/prisma';
 
@@ -139,7 +139,7 @@ export const handleForgotPassword = async (
         : 'forgot-password-seller-email'
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `OTP sent to your email. Please verify your account`,
     });
   } catch (error) {
@@ -160,10 +160,10 @@ export const verifyForgotPasswordOTP = async (
 
     await verifyOTP(email, otp);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'OTP verified successfully. You can now reset your password.',
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
