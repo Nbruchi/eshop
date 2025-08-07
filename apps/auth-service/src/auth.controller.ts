@@ -129,7 +129,7 @@ export const userLogin = async (
 
     return res.status(200).json({
       message: `Logged in successfully!`,
-      user: { id: user.id, email: user.email, name: user.name },
+      user,
     });
   } catch (error) {
     return next(error);
@@ -463,7 +463,7 @@ export const sellerLogin = async (
 
     return res.status(200).json({
       message: `Logged in successfully!`,
-      user: { id: seller.id, email: seller.email, name: seller.name },
+      user: seller,
     });
   } catch (error) {
     return next(error);
@@ -607,3 +607,60 @@ export const getUserAddresses = async (
     return next(error);
   }
 };
+
+// Change password
+export const changePassword = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.user.id;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return next(new ValidationError('All fields are required'));
+    }
+
+    if (newPassword !== confirmPassword) {
+      return next(new ValidationError("Passwords don't match!"));
+    }
+
+    if (currentPassword === newPassword) {
+      return next(
+        new ValidationError(
+          "New password can't be the same as current password!"
+        )
+      );
+    }
+
+    const user = await prisma.users.findUnique({ where: { id: userId } });
+
+    if (!user || !user.password) {
+      return next(new NotFoundError('User not found'));
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isPasswordCorrect) {
+      return next(new ValidationError('Current password is incorect'));
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    await prisma.users.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return res
+      .status(200)
+      .json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    return next(error);
+  }
+};
+

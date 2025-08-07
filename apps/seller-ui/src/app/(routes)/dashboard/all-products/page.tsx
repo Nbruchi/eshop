@@ -25,14 +25,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Product } from 'apps/user-ui/src/utils/types';
 
 const AllProducts = () => {
   const [globalFilter, setGlobalFilter] = useState('');
   const [analyticsData, setAnalyticsData] = useState(null);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const queryClient = useQueryClient();
 
   const fetchProducts = async () => {

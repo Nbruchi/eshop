@@ -37,6 +37,10 @@ app.use(limiter);
 
 app.use('/products', proxy('http://localhost:6002'));
 app.use('/orders', proxy('http://localhost:6003'));
+app.use('/admin', proxy('http://localhost:6004'));
+app.use("/chats",proxy("http://localhost:6005"))
+app.use("/logs",proxy("http://localhost:6006"))
+app.use("/recommendation",proxy("http://localhost:6007"))
 app.use('/api', proxy('http://localhost:6001'));
 
 app.get('/gateway-health', (req, res) => {

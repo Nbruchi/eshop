@@ -25,6 +25,7 @@ model users {
   id        String        @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String        @unique
+  role      String        @default("user")
   password  String?
   reviews   shopReviews[]
   following String[]
@@ -102,6 +103,8 @@ model siteConfig {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   categories    String[]
   subCategories Json
+  logo          String?
+  banner        String?
 }
 
 model discountCodes {
@@ -250,4 +253,54 @@ model userAnalytics {
   lastTrained     DateTime @default(now())
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model notifications {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  creatorId    String   @db.ObjectId
+  receiverId   String
+  redirectLink String?
+  title        String
+  message      String
+  status       String   @default("Unread")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model conversationGroups {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  isGroup        Boolean  @default(false)
+  name           String?
+  creatorId      String
+  participantIds String[] @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model participants {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String    @db.ObjectId
+  userId         String?   @db.ObjectId
+  sellerId       String?   @db.ObjectId
+  lastSeenAt     DateTime?
+  isOnline       Boolean   @default(false)
+  unreadCount    Int       @default(0)
+  muted          Boolean   @default(false)
+  joinedAt       DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model messages {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String   @db.ObjectId
+  senderId       String   @db.ObjectId
+  senderType     String
+  content        String?
+  attachments    String
+  status         String   @default("Sent")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([content, conversationId, senderId, createdAt])
 }

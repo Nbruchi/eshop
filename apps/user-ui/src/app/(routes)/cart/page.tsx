@@ -24,6 +24,7 @@ const Cart = () => {
   const [error, setError] = useState<string | null>(null);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [storedCouponCode, setStoredCouponCode] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const removeFromCart = useStore((state) => state.removeFromCart);
   const [discountedProductId, setDiscountedProductId] = useState('');
@@ -55,7 +56,39 @@ const Cart = () => {
     removeFromCart(id, user, location, deviceInfo);
   };
 
-  const applyCouponCode = () => {};
+  const applyCouponCode = async () => {
+    setError(' ');
+
+    if (!couponCode.trim()) {
+      setError('Coupon code is required');
+      return;
+    }
+
+    try {
+      const res = await axiosInstance.put('/orders/verify-coupon', {
+        couponCode: couponCode.trim(),
+        cart,
+      });
+
+      if (res.data.valid) {
+        setStoredCouponCode(couponCode.trim());
+        setDiscountAmount(parseFloat(res.data.discountAmount));
+        setDiscountPercent(res.data.discount);
+        setDiscountedProductId(res.data.discountedProductId);
+        setCouponCode('');
+      } else {
+        setDiscountAmount(0);
+        setDiscountPercent(0);
+        setDiscountedProductId('');
+        setError(res.data.message || 'Coupon not valid for any items in cart');
+      }
+    } catch (error: any) {
+      setDiscountAmount(0);
+      setDiscountPercent(0);
+      setDiscountedProductId('');
+      setError(error.response.data.message);
+    }
+  };
 
   // Get address
   const { data: addresses, isLoading } = useQuery({
@@ -76,12 +109,21 @@ const Cart = () => {
   }, [addresses, selectedAddressId]);
 
   const createPaymentSession = async () => {
+    if (addresses.length === 0) {
+      toast.error('Please set your delivery address to create an order');
+      return;
+    }
     setLoading(true);
     try {
       const res = await axiosInstance.post('/orders/create-payment-session', {
         cart,
         selectedAddressId,
-        coupon: {},
+        coupon: {
+          code: storedCouponCode,
+          discountAmount,
+          discountPercent,
+          discountedProductId,
+        },
       });
 
       const sessionId = res.data.sessionId;
@@ -249,10 +291,8 @@ const Cart = () => {
                   >
                     Apply
                   </button>
-                  {error && (
-                    <p className="text-sm pt-2 text-red-500">{error}</p>
-                  )}
                 </div>
+                {error && <p className="text-sm pt-2 text-red-500">{error}</p>}
                 <hr className="my-4 text-slate-200" />
                 <div className="mb-4">
                   <h4 className="mb-[7px] font-[500] text-[15px]">

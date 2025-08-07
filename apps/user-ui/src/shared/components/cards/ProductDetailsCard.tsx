@@ -1,6 +1,5 @@
 'use client';
 
-import { ProductImage } from 'apps/user-ui/src/utils/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -11,6 +10,8 @@ import { useStore } from 'apps/user-ui/src/store';
 import useDeviceTracking from 'apps/user-ui/src/hooks/useDeviceTracking';
 import useLocationTracking from 'apps/user-ui/src/hooks/useLocationTracking';
 import useUser from 'apps/user-ui/src/hooks/useUser';
+import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
+import { isProtected } from 'apps/user-ui/src/utils/protected';
 
 interface Props {
   open: boolean;
@@ -19,24 +20,45 @@ interface Props {
 }
 
 const ProductDetailsCard = ({ open, setOpen, data }: Props) => {
-  const [activeImage, setActiveImage] = useState<number>(0);
-  const [isSelectedColor, setIsSelectedColor] = useState<string>('');
-  const [selectedSize, setSelectedSize] = useState<string>('');
-  const [quantity, setQuantity] = useState<number>(1);
+  const router = useRouter();
   const { user } = useUser();
   const { location } = useLocationTracking();
   const { deviceInfo } = useDeviceTracking();
-  const router = useRouter();
   const cart = useStore((state) => state.cart);
+  const [isLoading, setIsLoading] = useState(false);
+  const [quantity, setQuantity] = useState<number>(1);
   const wishlist = useStore((state) => state.wishlist);
   const addToCart = useStore((state) => state.addToCart);
-  const addToWishlist = useStore((state) => state.addToWishlist);
-  const removeFromWishlist = useStore((state) => state.removeFromWishlist);
-  const isWishlisted = wishlist.some((item) => item.id === data?.id);
+  const [activeImage, setActiveImage] = useState<number>(0);
   const isInCart = cart.some((item) => item.id === data?.id);
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const addToWishlist = useStore((state) => state.addToWishlist);
+  const isWishlisted = wishlist.some((item) => item.id === data?.id);
+  const [isSelectedColor, setIsSelectedColor] = useState<string>('');
+  const removeFromWishlist = useStore((state) => state.removeFromWishlist);
 
   const estimatedDelivery = new Date();
   estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
+
+  const handleChat = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+
+    try {
+      const res = await axiosInstance.post(
+        '/chats/create-user-conversation-group',
+        { sellerId: data.shop.sellerId },
+        isProtected
+      );
+
+      router.push(`/inbox?conversationId=${res.data.conversation.id}`);
+    } catch (error) {
+      console.log(`Error creating conversation group: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div
@@ -58,7 +80,7 @@ const ProductDetailsCard = ({ open, setOpen, data }: Props) => {
             />
             <div className="flex gap-2 mt-4">
               {/* Thumbnails */}
-              {data?.images.map((image: ProductImage, index: number) => (
+              {data?.images.map((image: any, index: number) => (
                 <div
                   key={index}
                   className={`cursor-pointer border rounded-md ${
@@ -107,7 +129,7 @@ const ProductDetailsCard = ({ open, setOpen, data }: Props) => {
               </div>
               <button
                 className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 font-medium transition text-white mt-2"
-                onClick={() => router.push(`/inbox?shopId=${data?.shop?.id}`)}
+                onClick={() => handleChat()}
               >
                 <MessageCircle size={20} />
                 Chat with Seller

@@ -1,10 +1,12 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
-import useUser from 'apps/user-ui/src/hooks/useUser';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import useRequireAuth from 'apps/user-ui/src/hooks/useRequireAuth';
 import QuickActionCard from 'apps/user-ui/src/shared/components/cards/QuickActionCard';
 import StatCard from 'apps/user-ui/src/shared/components/cards/StatCard';
+import ChangePasswordSection from 'apps/user-ui/src/shared/widgets/section/ChangePasswordSection';
 import NavItem from 'apps/user-ui/src/shared/widgets/section/NavItem';
+import OrdersSection from 'apps/user-ui/src/shared/widgets/section/OrdersSection';
 import ShippingAddressSection from 'apps/user-ui/src/shared/widgets/section/ShippingAddressSection';
 import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
 import {
@@ -34,7 +36,7 @@ const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const { user, isLoading } = useUser();
+  const { user, isLoading } = useRequireAuth();
   const queryTab = searchParams.get('active') || 'Profile';
   const [activeTab, setActiveTab] = useState(queryTab);
 
@@ -54,6 +56,26 @@ const Page = () => {
     });
   };
 
+  const fetchOrders = async () => {
+    const res = await axiosInstance.get('/orders/get-user-orders');
+    return res.data.orders;
+  };
+
+  const { data: orders, isLoading: isOrdersLoading } = useQuery({
+    queryKey: ['seller-orders'],
+    queryFn: fetchOrders,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const totalOrders = orders.length;
+  const processingOrders = orders.filter(
+    (o: any) =>
+      o.deliveryStatus !== 'Delivered' && o.deliveryStatus !== 'Cancelled'
+  ).length;
+  const completedOrders = orders.filter(
+    (o: any) => o.deliveryStatus === 'Delivered'
+  ).length;
+
   return (
     <div className="bg-gray-50 p-6 pb-14">
       <div className="md:max-w-7xl mx-auto">
@@ -65,17 +87,25 @@ const Page = () => {
               {isLoading ? (
                 <Loader2 className="inline animate-spin size-5" />
               ) : (
-                `${user.name || 'User'}`
-              )}
+                `${user?.name || 'User'}`
+              )}/
             </span>
             👋
           </h1>
         </div>
         {/* Stat cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <StatCard title="Total Orders" count={10} Icon={Clock} />
-          <StatCard title="Processing Orders" count={4} Icon={Truck} />
-          <StatCard title="Completed Orders" count={5} Icon={CheckCircle} />
+          <StatCard title="Total Orders" count={totalOrders} Icon={Clock} />
+          <StatCard
+            title="Processing Orders"
+            count={processingOrders}
+            Icon={Truck}
+          />
+          <StatCard
+            title="Completed Orders"
+            count={completedOrders}
+            Icon={CheckCircle}
+          />
         </div>
         {/* Sidebar */}
         <div className="mt-10 flex flex-col md:flex-row gap-6">
@@ -148,17 +178,21 @@ const Page = () => {
                 </div>
                 <p>
                   <span className="font-semibold">Joined:</span>{' '}
-                  {new Date(user.createdAt).toLocaleDateString()}
+                  {new Date(user?.createdAt).toLocaleDateString()}
                 </p>
                 <p>
                   <span className="font-semibold">Earned Points:</span>{' '}
-                  {user.points || 0}
+                  {user?.points || 0}
                 </p>
               </div>
             ) : (
               <p className="text-center">User Information not available yet!</p>
             )}
             {activeTab === 'Shipping Address' && <ShippingAddressSection />}
+            {activeTab === 'My Orders' && (
+              <OrdersSection isLoading={isOrdersLoading} orders={orders} />
+            )}
+            {activeTab === 'Change Password' && <ChangePasswordSection />}
           </div>
           {/* Right quick panel */}
           <div className="w-full md:w-1/4 space-y-4">

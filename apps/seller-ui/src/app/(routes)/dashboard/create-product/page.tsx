@@ -17,6 +17,7 @@ import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import Breadcrumb from 'apps/seller-ui/src/shared/components/Breadcrumb';
 
 type FormData = {
   discountCodes: string[];
@@ -250,13 +251,7 @@ const CreateProduct = () => {
         Create Product
       </h2>
       {/* Breadcrumb */}
-      <div className="flex items-center">
-        <Link href="/dashboard" className="text-[#80deea] cursor-pointer">
-          Dashboard
-        </Link>
-        <ChevronRight size={20} className="opacity-[0.98]" />
-        <span>Create Product</span>
-      </div>
+      <Breadcrumb title="Create Product" />
       {/* Content Layout */}
       <div className="py-4 w-full flex gap-6">
         {/* Left side - Image upload */}

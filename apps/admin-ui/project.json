@@ -1,0 +1,9 @@
+{
+  "name": "admin-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/admin-ui",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project admin-ui --web",
+  "targets": {}
+}

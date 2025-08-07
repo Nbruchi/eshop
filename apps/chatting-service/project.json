@@ -1,0 +1,27 @@
+{
+  "name": "chatting-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/chatting-service/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "chatting-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "chatting-service:build:development"
+        },
+        "production": {
+          "buildTarget": "chatting-service:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Breadcrumb from 'apps/seller-ui/src/shared/components/Breadcrumb';
 import DeleteDiscountCodeModal from 'apps/seller-ui/src/shared/components/DeleteDiscountCodeModal';
 import Input from 'apps/seller-ui/src/shared/input';
 import axiosInstance from 'apps/seller-ui/src/utils/axiosInstance';
@@ -101,13 +102,7 @@ const DiscountCodes = () => {
         </button>
       </div>
       {/* Breadcrumb */}
-      <div className="flex items-center">
-        <Link href="/dashboard" className="text-[#80deea] cursor-pointer">
-          Dashboard
-        </Link>
-        <ChevronRight size={20} className="opacity-[0.98] text-white" />
-        <span className="text-white">Discount Code</span>
-      </div>
+      <Breadcrumb title="Discount Codes" />
       <div className="mt-8 bg-gray-900 p-6 rounded-lg shadow-lg">
         <h3 className="text-lg font-semibold text-white mb-4">
           Your Discount codes
