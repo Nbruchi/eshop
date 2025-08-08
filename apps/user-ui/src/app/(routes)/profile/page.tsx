@@ -33,11 +33,22 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+export interface User {
+  name: string;
+  points?: number;
+  email: string;
+  avatar: string;
+  createdAt: string;
+}
+
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const { user, isLoading } = useRequireAuth();
+  const { user, isLoading } = useRequireAuth() as {
+    user: User | null;
+    isLoading: boolean;
+  };
   const queryTab = searchParams.get('active') || 'Profile';
   const [activeTab, setActiveTab] = useState(queryTab);
 
@@ -78,12 +89,12 @@ const Page = () => {
   ).length;
 
   const { data: notifications, isLoading: areNotificationsLoading } = useQuery({
-    queryKey: ["notifications"],
+    queryKey: ['notifications'],
     queryFn: async () => {
-      const res = await axiosInstance.get("/admin/get-user-notifications")
+      const res = await axiosInstance.get('/admin/get-user-notifications');
       return res.data.notifications;
-    }
-  })
+    },
+  });
 
   const markAsRead = async (notificationId: string) => {
     await axiosInstance.put(`/seller/mark-as-read`, {

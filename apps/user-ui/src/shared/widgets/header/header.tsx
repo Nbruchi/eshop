@@ -11,8 +11,19 @@ import { useStore } from 'apps/user-ui/src/store';
 import useLayout from 'apps/user-ui/src/hooks/useLayout';
 import Image from 'next/image';
 
+interface User {
+  name: string;
+  email: string;
+  avatar: string;
+  createdAt: string;
+  points?: number;
+}
+
 const Header = () => {
-  const { user, isLoading } = useUser();
+  const { user, isLoading } = useUser() as {
+    user: User | null;
+    isLoading: boolean;
+  };
   const { layout } = useLayout();
   const cart = useStore((state) => state.cart);
   const wishlist = useStore((state) => state.wishlist);
