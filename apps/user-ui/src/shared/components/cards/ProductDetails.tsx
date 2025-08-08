@@ -21,12 +21,15 @@ import ReactImageMagnify from 'react-image-magnify';
 import { useStore } from 'apps/user-ui/src/store';
 import ProductCard from './ProductCard';
 import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
+import { isProtected } from 'apps/user-ui/src/utils/protected';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   product: any;
 }
 
 const ProductDetails = ({ product }: Props) => {
+  const router = useRouter();
   const { user, isLoading } = useUser();
   const addToCart = useStore((state) => state.addToCart);
   const cart = useStore((state) => state.cart);
@@ -37,6 +40,7 @@ const ProductDetails = ({ product }: Props) => {
   const isInWishlist = wishlist.some((item) => item.id === product.id);
   const { location } = useLocationTracking();
   const { deviceInfo } = useDeviceTracking();
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [quantity, setQuantity] = useState(1);
@@ -85,6 +89,26 @@ const ProductDetails = ({ product }: Props) => {
   useEffect(() => {
     fetchFilteredProducts();
   }, [priceRange]);
+
+  const handleChat = async () => {
+    if (isChatLoading) return;
+
+    setIsChatLoading(true);
+
+    try {
+      const res = await axiosInstance.post(
+        '/chats/create-user-conversation-group',
+        { sellerId: product.shop.sellerId },
+        isProtected
+      );
+
+      router.push(`/inbox?conversationId=${res.data.conversation.id}`);
+    } catch (error) {
+      console.log(`Error creating conversation group: ${error}`);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
 
   return (
     <div className="w-full bg-[#f5f5f5] py-5">
@@ -348,12 +372,12 @@ const ProductDetails = ({ product }: Props) => {
                     {product.shop?.name}
                   </span>
                 </div>
-                <Link
-                  href="#"
+                <button
+                  onClick={() => handleChat()}
                   className="text-blue-500 text-sm flex items-center gap-1"
                 >
                   <MessageSquareText /> Chat now
-                </Link>
+                </button>
               </div>
               {/* Seller performance stats */}
               <div className="grid grid-cols-3 gap-2 border-t border-t-gray-200 mt-3">

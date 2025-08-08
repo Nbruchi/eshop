@@ -8,9 +8,12 @@ import HeaderBottom from './header-bottom';
 import useUser from 'apps/user-ui/src/hooks/useUser';
 import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
 import { useStore } from 'apps/user-ui/src/store';
+import useLayout from 'apps/user-ui/src/hooks/useLayout';
+import Image from 'next/image';
 
 const Header = () => {
   const { user, isLoading } = useUser();
+  const { layout } = useLayout();
   const cart = useStore((state) => state.cart);
   const wishlist = useStore((state) => state.wishlist);
   const [searchQuery, setSearchQuery] = useState('');
@@ -38,9 +41,19 @@ const Header = () => {
       <div className="w-[80%] py-5 m-auto flex items-center justify-between">
         <div>
           <Link href="/">
-            <span className="text-2xl font-[500]">
-              <Logo />
-            </span>
+            {layout.logo ? (
+              <Image
+                src={layout.logo}
+                alt="logo"
+                width={300}
+                height={100}
+                className="h-[70px] ml-[-50px] mb-[-30px] object-cover"
+              />
+            ) : (
+              <span className="text-2xl font-[500]">
+                <Logo />
+              </span>
+            )}
           </Link>
         </div>
         <div className="w-[50%] relative">

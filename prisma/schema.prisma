@@ -230,8 +230,8 @@ model followers {
 
 model productAnalytics {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  shopId       String
-  productId    String
+  shopId       String   @unique @db.ObjectId
+  productId    String   @unique @db.ObjectId
   views        Int      @default(0)
   cartAdds     Int      @default(0)
   wishlistAdds Int      @default(0)
@@ -258,7 +258,7 @@ model userAnalytics {
 model notifications {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   creatorId    String   @db.ObjectId
-  receiverId   String
+  receiverId   String   @db.ObjectId
   redirectLink String?
   title        String
   message      String
@@ -271,7 +271,7 @@ model conversationGroups {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   isGroup        Boolean  @default(false)
   name           String?
-  creatorId      String
+  creatorId      String   @db.ObjectId
   participantIds String[] @db.ObjectId
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

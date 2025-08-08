@@ -26,7 +26,7 @@ export const newConversation = async (
     }
 
     // Directly check if a conversation group already exists for this user and seller
-    const existingGroup = await prisma.conversationGroup.findFirst({
+    const existingGroup = await prisma.conversationGroups.findFirst({
       where: {
         isGroup: false,
         participantIds: {
@@ -46,7 +46,7 @@ export const newConversation = async (
       data: {
         isGroup: false,
         creatorId: userId,
-        participantsIds: [userId, sellerId],
+        participantIds: [userId, sellerId],
       },
     });
 
@@ -72,7 +72,7 @@ export const getUserConversations = async (
     const userId = req.user?.id;
 
     // Find all conversation groups where the user is a participant
-    const conversations = await prisma.conversationGroup.findMany({
+    const conversations = await prisma.conversationGroups.findMany({
       where: { participantIds: { has: userId } },
       orderBy: { updatedAt: 'desc' },
     });
@@ -80,7 +80,7 @@ export const getUserConversations = async (
     await Promise.all(
       conversations.map(async (group) => {
         //   Get the seller participant inside tihs conversation
-        const sellerParticipant = await prisma.participant.findFirst({
+        const sellerParticipant = await prisma.participants.findFirst({
           where: { conversationId: group.id, sellerId: { not: null } },
         });
 
@@ -138,7 +138,7 @@ export const getSellerConversations = async (
     const sellerId = req.seller?.id;
 
     // Find all conversation groups where the user is a participant
-    const conversations = await prisma.conversationGroup.findMany({
+    const conversations = await prisma.conversationGroups.findMany({
       where: { participantIds: { has: sellerId } },
       orderBy: { updatedAt: 'desc' },
     });
@@ -146,7 +146,7 @@ export const getSellerConversations = async (
     await Promise.all(
       conversations.map(async (group) => {
         //   Get the seller participant inside tihs conversation
-        const userParticipant = await prisma.participant.findFirst({
+        const userParticipant = await prisma.participants.findFirst({
           where: { conversationId: group.id, userId: { not: null } },
         });
 
@@ -228,7 +228,7 @@ export const fetchUserMessages = async (
     await clearUnseenCount('user', conversationId);
 
     // Get the seller participant
-    const sellerParticipant = await prisma.participant.findFirst({
+    const sellerParticipant = await prisma.participants.findFirst({
       where: {
         conversationId,
         sellerId: { not: null },
@@ -307,7 +307,7 @@ export const fetchSellerMessages = async (
     await clearUnseenCount('seller', conversationId);
 
     // Get the seller participant
-    const userParticipant = await prisma.participant.findFirst({
+    const userParticipant = await prisma.participants.findFirst({
       where: {
         conversationId,
         userId: { not: null },

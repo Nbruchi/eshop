@@ -17,7 +17,7 @@ const Orders = () => {
   const [globalFilter, setGlobalFilter] = useState('');
 
   const fetchOrders = async () => {
-    const res = await axiosInstance.get('/orders/get-seller-orders');
+    const res = await axiosInstance.get('/orders/get-user-orders');
     return res.data.orders;
   };
 

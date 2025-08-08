@@ -29,6 +29,7 @@ import {
   User,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -76,6 +77,20 @@ const Page = () => {
     (o: any) => o.deliveryStatus === 'Delivered'
   ).length;
 
+  const { data: notifications, isLoading: areNotificationsLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/admin/get-user-notifications")
+      return res.data.notifications;
+    }
+  })
+
+  const markAsRead = async (notificationId: string) => {
+    await axiosInstance.put(`/seller/mark-as-read`, {
+      notificationId,
+    });
+  };
+
   return (
     <div className="bg-gray-50 p-6 pb-14">
       <div className="md:max-w-7xl mx-auto">
@@ -88,7 +103,8 @@ const Page = () => {
                 <Loader2 className="inline animate-spin size-5" />
               ) : (
                 `${user?.name || 'User'}`
-              )}/
+              )}
+              /
             </span>
             👋
           </h1>
@@ -193,6 +209,51 @@ const Page = () => {
               <OrdersSection isLoading={isOrdersLoading} orders={orders} />
             )}
             {activeTab === 'Change Password' && <ChangePasswordSection />}
+            {activeTab === 'Notifications' && (
+              <div className="space-y-4 text-sm text-gray-700">
+                <p>Notifications</p>
+
+                {areNotificationsLoading ? (
+                  <p>Loading...</p>
+                ) : notifications.length === 0 ? (
+                  <p>No notifications available yet</p>
+                ) : (
+                  <div className="md:w-[80%] my-6 rounded-lg divide-y divide-gray-800 bg-black/40 shadow-sm backdrop-blur-sm">
+                    {notifications.map((notification: any) => (
+                      <Link
+                        href={notification.redirectLink}
+                        key={notification.id}
+                        className={`block px-5 py-4 transition ${
+                          notification.status !== 'Unread'
+                            ? 'hover:bg-gray-800/40'
+                            : 'bg-gray-800/50 hover:bg-gray-800/70'
+                        }`}
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex flex-col">
+                            <span className="text-white font-medium">
+                              {notification.title}
+                            </span>
+                            <span className="text-gray-300 text-sm">
+                              {notification.message}
+                            </span>
+                            <span className="text-gray-500 text-xs mt-1">
+                              {new Date(
+                                notification.createdAt
+                              ).toLocaleDateString('en-UK', {
+                                dateStyle: 'medium',
+                                timeStyle: 'short',
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           {/* Right quick panel */}
           <div className="w-full md:w-1/4 space-y-4">

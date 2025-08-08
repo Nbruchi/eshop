@@ -13,10 +13,11 @@ const Page = () => {
     queryKey: ['products'],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        '/products/get-all-products?page=1&limit=10'
+        '/recommendation/get-recommendation-products'
       );
-      return response?.data?.products;
+      return response?.data?.recommendations;
     },
+    staleTime: 1000 * 60 * 2,
   });
 
   const {

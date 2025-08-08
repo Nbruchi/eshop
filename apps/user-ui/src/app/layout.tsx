@@ -2,6 +2,7 @@ import Header from '../shared/widgets/header/header';
 import { Poppins } from 'next/font/google';
 import Providers from './providers';
 import './global.css';
+import Footer from '../shared/widgets/Footer';
 
 export const metadata = {
   title: 'Eshop',
@@ -25,6 +26,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>

@@ -5,6 +5,7 @@ import {
   createShop,
   createStripeLink,
   deleteUserAddress,
+  getLayoutData,
   getSeller,
   getUser,
   getUserAddresses,
@@ -39,6 +40,7 @@ router.put('/change-password/:userId', isAuthenticated, changePassword);
 router.post('/register-seller', registerSeller);
 router.post('/verify-seller', verifySeller);
 router.post('/create-shop', createShop);
+router.get('/get-layouts', getLayoutData);
 router.get('/logged-in-seller', isAuthenticated, isSeller, getSeller);
 router.post('/create-stripe-link', createStripeLink);
 router.post('/login-seller', sellerLogin);

@@ -329,3 +329,41 @@ export const getAllSellers = async (
     return next(error);
   }
 };
+
+// Get all notifications
+export const allNotifications = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const notifications = await prisma.notifications.findMany({
+      where: { receiverId: 'admin' },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return res.status(200).json({ success: true, notifications });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// Get user notifications
+export const userNotifications = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user?.id;
+
+  try {
+    const notifications = await prisma.notifications.findMany({
+      where: { receiverId: userId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return res.status(200).json({ success: true, notifications });
+  } catch (error) {
+    return next(error);
+  }
+};

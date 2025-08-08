@@ -664,3 +664,15 @@ export const changePassword = async (
   }
 };
 
+// Fetch layout data
+export const getLayoutData = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const layout = await prisma.siteConfig.findFirst()
+
+    return res.status(200).json({
+      success:true,layout
+    })
+  } catch (error) {
+    return next(error)
+  }
+}

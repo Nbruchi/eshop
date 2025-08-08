@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npx nx run-many --target=serve --all",
     "docs": "node apps/auth-service/src/swagger.js",
+    "postinstall": "patch-package",
     "user": "npx nx run-many --target=dev --all --projects=user-ui",
     "admin": "npx nx run-many --target=dev --all --projects=admin-ui",
     "seller": "npx nx run-many --target=dev --all --projects=seller-ui",

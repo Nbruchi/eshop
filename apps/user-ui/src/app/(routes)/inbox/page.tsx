@@ -1,13 +1,14 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useWebSocket } from 'apps/user-ui/src/context/WebSocketContext';
 import useRequireAuth from 'apps/user-ui/src/hooks/useRequireAuth';
 import ChatInput from 'apps/user-ui/src/shared/components/ChatInput';
 import axiosInstance from 'apps/user-ui/src/utils/axiosInstance';
 import { isProtected } from 'apps/user-ui/src/utils/protected';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, FormEvent } from 'react';
 
 const Inbox = () => {
   const router = useRouter();
@@ -15,9 +16,9 @@ const Inbox = () => {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const [message, setMessage] = useState('');
-  const [hasMore, setHasMore] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
+  const { ws } = useWebSocket();
   const [chats, setChats] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(false);
   const conversationId = searchParams.get('conversationId');
   const [hasFetchedOnce, setHasFetchedOnce] = useState(true);
   const scrollAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -48,6 +49,51 @@ const Inbox = () => {
       setSelectedChat(chat || null);
     }
   }, [conversationId, chats]);
+
+  useEffect(() => {
+    if (!ws) return;
+
+    ws.onmessage = (event: any) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'NEW_MESSAGE') {
+        const newMessage = data?.payload;
+
+        if (newMessage.conversationId === conversationId) {
+          queryClient.setQueryData(
+            ['messages', conversationId],
+            (old: any[] = []) => [
+              ...old,
+              {
+                content: newMessage.content || '',
+                senderType: newMessage.senderType,
+                seen: false,
+                createdAt: newMessage.createdAt || new Date().toISOString(),
+              },
+            ]
+          );
+          scrollToBottom();
+        }
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.conversationId === newMessage.conversationId
+              ? { ...chat, lastMessage: newMessage.content }
+              : chat
+          )
+        );
+      }
+      if (data.type === 'UNSEEN_COUNT_UPDATE') {
+        const { conversationId, count } = data.payload;
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.conversationId === conversationId
+              ? { ...chat, unreadCount: count }
+              : chat
+          )
+        );
+      }
+    };
+  }, [ws, conversationId]);
 
   const getLastMessage = (chat: any) => chat.lastMessage || '';
 
@@ -84,8 +130,6 @@ const Inbox = () => {
     setHasMore(res.data.hasMore);
   };
 
-  const handleSend = () => {};
-
   const handleChatSelect = async (chat: any) => {
     setHasFetchedOnce(false);
     setChats((prev) =>
@@ -94,8 +138,52 @@ const Inbox = () => {
       )
     );
     router.push(`?conversationId=${chat.conversationId}`);
+
+    ws.send(
+      JSON.stringify({
+        type: 'MARK_AS_SEEN',
+        conversationId: chat.conversationId,
+      })
+    );
   };
- 
+
+  const scrollToBottom = () =>
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        scrollAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
+    });
+
+  const handleSend = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!message.trim() || !selectedChat) return;
+
+    const payload = {
+      fromUserId: user?.id,
+      toUserId: selectedChat.seller?.id,
+      conversationId: selectedChat.conversationId,
+      messageBody: message,
+      senderType: 'user',
+    };
+
+    ws.send(JSON.stringify(payload));
+
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.conversationId
+          ? { ...chat, lastMessage: payload.messageBody }
+          : chat
+      )
+    );
+
+    setMessage('');
+    scrollToBottom();
+  };
+
+  useEffect(() => {
+    if (messages.length > 0) scrollToBottom();
+  }, [messages]);
+
   return (
     <div className="w-full">
       <div className="mx-auto md:w-[80%] pt-5">
@@ -144,6 +232,11 @@ const Inbox = () => {
                           <p className="text-xs text-gray-500 truncate max-w-[170px]">
                             {getLastMessage(chat)}
                           </p>
+                          {chat?.unreadCount > 0 && (
+                            <span className="ml-2 text-[10px] bg-blue-600 text-white">
+                              {chat.unreadCount > 9 ? '9+' : chat.unreadCount}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </button>

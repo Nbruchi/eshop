@@ -2,12 +2,10 @@
 
 import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import useUser from '../hooks/useUser';
+import { WebSocketProvider } from '../context/WebSocketContext';
 
-interface Props {
-  children?: ReactNode;
-}
-
-const Providers = ({ children }: Props) => {
+const Providers = ({ children }: Readonly<{ children: ReactNode }>) => {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -20,7 +18,27 @@ const Providers = ({ children }: Props) => {
       })
   );
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ProvidersWithWebSocket>{children}</ProvidersWithWebSocket>
+    </QueryClientProvider>
+  );
+};
+
+const ProvidersWithWebSocket = ({
+  children,
+}: Readonly<{ children: ReactNode }>) => {
+  const { user, isLoading } = useUser();
+
+  if (isLoading) return null;
+
+  return (
+    <>
+      {user ? (
+        <WebSocketProvider user={user}>{children}</WebSocketProvider>
+      ) : (
+        children
+      )}
+    </>
   );
 };
 

@@ -13,23 +13,23 @@ const WebSocketContext = createContext<any>(null);
 
 export const WebSocketProvider = ({
   children,
-  user,
+  seller,
 }: {
   children: ReactNode;
-  user: any;
+  seller: any;
 }) => {
   const wsRef = useRef<WebSocket | null>(null);
   const [wsReady, setWsReady] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    if (!user.id) return;
+    if (!seller.id) return;
 
     const ws = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_URL!);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      ws.send(`user_${user.id}`);
+      ws.send(`seller_${seller.id}`);
       setWsReady(true);
     };
 
@@ -43,7 +43,7 @@ export const WebSocketProvider = ({
     };
 
     return () => ws.close();
-  }, [user?.id]);
+  }, [seller?.id]);
 
   if (!wsReady) return null;
 
