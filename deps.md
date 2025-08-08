@@ -2,9 +2,6 @@ kafka provider
 
 @tensorflow/tfjs-node
 
-patch-package --dev
-postinstall-postinstall --dev
-
 <!-- Common command -->
 npx nx g @nx/express:app seller-service --directory=apps/seller-service --e2eTestRunner=none
 

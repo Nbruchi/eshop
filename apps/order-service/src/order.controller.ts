@@ -290,7 +290,7 @@ export const createOrder = async (
           });
 
           await prisma.productAnalytics.upsert({
-            where: { productId },
+            where: {id: productId },
             create: {
               productId,
               shopId,
